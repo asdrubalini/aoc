@@ -7,6 +7,7 @@ name = "advent-of-code-2021"
 version = "0.1.0"
 dependencies = [
  "itertools",
+ "paste",
 ]
 
 [[package]]
@@ -23,3 +24,9 @@ checksum = "69ddb889f9d0d08a67338271fa9b62996bc788c7796a5c18cf057420aaed5eaf"
 dependencies = [
  "either",
 ]
+
+[[package]]
+name = "paste"
+version = "1.0.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0744126afe1a6dd7f394cb50a716dbe086cb06e255e53d8d0185d82828358fb5"

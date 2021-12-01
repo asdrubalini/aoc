@@ -1,29 +1,26 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_macros)]
 
-use itertools::Itertools;
+mod aoc;
 
-fn solve<S: AsRef<str>>(input: S) -> usize {
-    let input = input.as_ref();
+/// Generate tests for day n
+macro_rules! test_day {
+    ($struct_name:ident) => {
+        use paste::paste;
 
-    // Split by line
-    let items = input
-        .split("\n")
-        .filter(|s| !s.is_empty())
-        .map(|s| s.parse::<u32>().unwrap());
-
-    items
-        .tuple_windows()
-        .filter(|(prev, next)| next > prev)
-        .count()
+        paste! {
+            #[test]
+            fn [<test_ $struct_name:snake>]() {
+                let input = $struct_name::input();
+                let solution = $struct_name::solve(input);
+                assert_eq!(solution, $struct_name::expected_solution());
+            }
+        }
+    };
 }
 
 #[cfg(test)]
 mod tests {
-    use super::solve;
+    use super::aoc::{solutions::*, Solution};
 
-    #[test]
-    fn test_1() {
-        let input = include_str!("./inputs/1.txt");
-        assert_eq!(solve(input), 1527);
-    }
+    test_day!(DayOne);
 }
