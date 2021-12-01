@@ -35,7 +35,7 @@ impl Solution for DayOne {
         include_str!("./inputs/1.txt").to_string()
     }
 
-    fn solve<S: AsRef<str>>(input: S) -> usize {
+    fn solve<S: AsRef<str>>(input: S) -> Self::Output {
         let input = input.as_ref();
 
         // Split by line
