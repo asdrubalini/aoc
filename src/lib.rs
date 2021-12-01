@@ -10,9 +10,7 @@ macro_rules! test_day {
         paste! {
             #[test]
             fn [<test_ $struct_name:snake>]() {
-                let input = $struct_name::input();
-                let solution = $struct_name::solve(input);
-                assert_eq!(solution, $struct_name::expected_solution());
+                $struct_name::assert_solutions();
             }
         }
     };

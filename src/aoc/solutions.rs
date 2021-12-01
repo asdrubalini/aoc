@@ -29,7 +29,7 @@ pub struct DayTwentyFour;
 pub struct DayTwentyFive;
 
 impl Solution for DayOne {
-    type Output = usize;
+    type Output = (usize, usize);
 
     fn input() -> String {
         include_str!("./inputs/1.txt").to_string()
@@ -40,17 +40,27 @@ impl Solution for DayOne {
 
         // Split by line
         let items = input
-            .split("\n")
+            .lines()
             .filter(|s| !s.is_empty())
             .map(|s| s.parse::<u32>().unwrap());
 
-        items
+        let increase_count = items
+            .clone()
             .tuple_windows()
             .filter(|(prev, next)| next > prev)
-            .count()
+            .count();
+
+        let triple_increase_count = items
+            .tuple_windows()
+            .map(|(a, b, c)| a + b + c)
+            .tuple_windows()
+            .filter(|(prev, next)| next > prev)
+            .count();
+
+        (increase_count, triple_increase_count)
     }
 
-    fn expected_solution() -> Self::Output {
-        1527
+    fn expected_solutions() -> Self::Output {
+        (1527, 1575)
     }
 }
