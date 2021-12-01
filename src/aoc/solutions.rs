@@ -45,7 +45,6 @@ impl Solution for DayOne {
             .map(|s| s.parse::<u32>().unwrap());
 
         let increase_count = items
-            .clone()
             .tuple_windows()
             .filter(|(prev, next)| next > prev)
             .count();
