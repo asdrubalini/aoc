@@ -127,6 +127,41 @@ impl DayThree {
             .map(|c| c.chars().collect::<Vec<char>>())
             .collect::<Vec<_>>()
     }
+
+    fn filter_out_bits(
+        mut candidates: Vec<Vec<char>>,
+        filter: fn(bit: char, one_count: usize, zero_count: usize) -> bool,
+    ) -> u64 {
+        let mut current_bit = 0;
+
+        while candidates.len() > 1 {
+            let one_bits_count = candidates
+                .iter()
+                .map(|bits| bits.get(current_bit).unwrap())
+                .filter(|bit| bit == &&'1')
+                .count();
+
+            let zero_bits_count = candidates
+                .iter()
+                .map(|bits| bits.get(current_bit).unwrap())
+                .filter(|bit| bit == &&'0')
+                .count();
+
+            candidates = candidates
+                .iter_mut()
+                .filter(|bits| {
+                    let bit = bits.get(current_bit).unwrap();
+                    filter(*bit, one_bits_count, zero_bits_count)
+                })
+                .map(|bits| bits.to_owned())
+                .collect();
+
+            current_bit += 1;
+        }
+
+        let rating = candidates.get_mut(0).unwrap().iter().collect::<String>();
+        u64::from_str_radix(&rating, 2).unwrap()
+    }
 }
 
 impl Solution for DayThree {
@@ -181,87 +216,18 @@ impl Solution for DayThree {
         let input = input.as_ref();
         let bins = Self::get_bins(input.to_string());
 
-        let mut oxygen_candidates = bins.clone();
-        let mut current_bit = 0;
+        let oxygen_generator_rating =
+            Self::filter_out_bits(bins.clone(), |bit, one_count, zero_count| {
+                bit == if one_count >= zero_count { '1' } else { '0' }
+            });
 
-        while oxygen_candidates.len() > 1 {
-            let one_bits_count = oxygen_candidates
-                .iter()
-                .map(|bits| bits.get(current_bit).unwrap())
-                .filter(|bit| bit == &&'1')
-                .count();
+        dbg!(oxygen_generator_rating);
 
-            let zero_bits_count = oxygen_candidates
-                .iter()
-                .map(|bits| bits.get(current_bit).unwrap())
-                .filter(|bit| bit == &&'0')
-                .count();
+        let scrubber_rating = Self::filter_out_bits(bins, |bit, one_count, zero_count| {
+            bit == if zero_count <= one_count { '0' } else { '1' }
+        });
 
-            oxygen_candidates = oxygen_candidates
-                .iter_mut()
-                .filter(|bits| {
-                    let bit = bits.get(current_bit).unwrap();
-
-                    bit == if one_bits_count >= zero_bits_count {
-                        &'1'
-                    } else {
-                        &'0'
-                    }
-                })
-                .map(|bits| bits.to_owned())
-                .collect();
-
-            current_bit += 1;
-        }
-
-        let oxygen_generator_rating = oxygen_candidates
-            .get_mut(0)
-            .unwrap()
-            .iter()
-            .collect::<String>();
-
-        let oxygen_generator_rating = u64::from_str_radix(&oxygen_generator_rating, 2).unwrap();
-
-        let mut scrubber_candidates = bins;
-        let mut current_bit = 0;
-
-        while scrubber_candidates.len() > 1 {
-            let one_bits_count = scrubber_candidates
-                .iter()
-                .map(|bits| bits.get(current_bit).unwrap())
-                .filter(|bit| bit == &&'1')
-                .count();
-
-            let zero_bits_count = scrubber_candidates
-                .iter()
-                .map(|bits| bits.get(current_bit).unwrap())
-                .filter(|bit| bit == &&'0')
-                .count();
-
-            scrubber_candidates = scrubber_candidates
-                .iter_mut()
-                .filter(|bits| {
-                    let bit = bits.get(current_bit).unwrap();
-
-                    bit == if zero_bits_count <= one_bits_count {
-                        &'0'
-                    } else {
-                        &'1'
-                    }
-                })
-                .map(|bits| bits.to_owned())
-                .collect();
-
-            current_bit += 1;
-        }
-
-        let scrubber_rating = scrubber_candidates
-            .get_mut(0)
-            .unwrap()
-            .iter()
-            .collect::<String>();
-
-        let scrubber_rating = u64::from_str_radix(&scrubber_rating, 2).unwrap();
+        dbg!(scrubber_rating);
 
         oxygen_generator_rating * scrubber_rating
     }
