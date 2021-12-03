@@ -1,5 +1,3 @@
-use std::slice::SliceIndex;
-
 use itertools::Itertools;
 
 use super::Solution;
@@ -22,12 +20,10 @@ impl Solution for DayOne {
             .filter(|s| !s.is_empty())
             .map(|s| s.parse::<u32>().unwrap());
 
-        let increase_count = items
+        items
             .tuple_windows()
             .filter(|(prev, next)| next > prev)
-            .count();
-
-        increase_count
+            .count()
     }
 
     fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
@@ -39,14 +35,12 @@ impl Solution for DayOne {
             .filter(|s| !s.is_empty())
             .map(|s| s.parse::<u32>().unwrap());
 
-        let triple_increase_count = items
+        items
             .tuple_windows()
             .map(|(a, b, c)| a + b + c)
             .tuple_windows()
             .filter(|(prev, next)| next > prev)
-            .count();
-
-        triple_increase_count
+            .count()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
@@ -169,7 +163,6 @@ impl Solution for DayThree {
             .collect::<String>();
 
         let epsilon_rate = gamma_rate
-            .clone()
             .chars()
             .map(|c| match c {
                 '0' => '1',
@@ -229,7 +222,7 @@ impl Solution for DayThree {
 
         let oxygen_generator_rating = u64::from_str_radix(&oxygen_generator_rating, 2).unwrap();
 
-        let mut scrubber_candidates = bins.clone();
+        let mut scrubber_candidates = bins;
         let mut current_bit = 0;
 
         while scrubber_candidates.len() > 1 {
