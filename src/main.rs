@@ -5,7 +5,7 @@ use aoc::{solutions::*, Solution};
 
 fn main() {
     let input = DayThree::input();
-    let out = DayThree::solve_first(&input);
+    let out = DayThree::solve_second(&input);
 
-    println!("first: {}", out);
+    println!("{}", out);
 }

@@ -1,4 +1,4 @@
-use std::ops::Add;
+use std::slice::SliceIndex;
 
 use itertools::Itertools;
 
@@ -125,6 +125,16 @@ impl Solution for DayTwo {
 
 pub struct DayThree;
 
+impl DayThree {
+    fn get_bins(input: String) -> Vec<Vec<char>> {
+        input
+            .lines()
+            .filter(|s| !s.is_empty())
+            .map(|c| c.chars().collect::<Vec<char>>())
+            .collect::<Vec<_>>()
+    }
+}
+
 impl Solution for DayThree {
     type Output = u64;
 
@@ -134,12 +144,7 @@ impl Solution for DayThree {
 
     fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
         let input = input.as_ref();
-
-        let bins = input
-            .lines()
-            .filter(|s| !s.is_empty())
-            .map(|c| c.chars().collect::<Vec<char>>())
-            .collect::<Vec<_>>();
+        let bins = Self::get_bins(input.to_string());
 
         let bins_length = bins.len();
         let mut ones_count = vec![0; bins[0].len()];
@@ -173,18 +178,103 @@ impl Solution for DayThree {
             })
             .collect::<String>();
 
-        let gamma_rate = u32::from_str_radix(&gamma_rate, 2).unwrap();
-        let epsilon_rate = u32::from_str_radix(&epsilon_rate, 2).unwrap();
+        let gamma_rate = u64::from_str_radix(&gamma_rate, 2).unwrap();
+        let epsilon_rate = u64::from_str_radix(&epsilon_rate, 2).unwrap();
 
-        (gamma_rate * epsilon_rate) as u64
+        gamma_rate * epsilon_rate
     }
 
     fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
-        todo!()
+        let input = input.as_ref();
+        let bins = Self::get_bins(input.to_string());
+
+        let mut oxygen_candidates = bins.clone();
+        let mut current_bit = 0;
+
+        while oxygen_candidates.len() > 1 {
+            let one_bits_count = oxygen_candidates
+                .iter()
+                .map(|bits| bits.get(current_bit).unwrap())
+                .filter(|bit| bit == &&'1')
+                .count();
+
+            let zero_bits_count = oxygen_candidates
+                .iter()
+                .map(|bits| bits.get(current_bit).unwrap())
+                .filter(|bit| bit == &&'0')
+                .count();
+
+            oxygen_candidates = oxygen_candidates
+                .iter_mut()
+                .filter(|bits| {
+                    let bit = bits.get(current_bit).unwrap();
+
+                    bit == if one_bits_count >= zero_bits_count {
+                        &'1'
+                    } else {
+                        &'0'
+                    }
+                })
+                .map(|bits| bits.to_owned())
+                .collect();
+
+            current_bit += 1;
+        }
+
+        let oxygen_generator_rating = oxygen_candidates
+            .get_mut(0)
+            .unwrap()
+            .iter()
+            .collect::<String>();
+
+        let oxygen_generator_rating = u64::from_str_radix(&oxygen_generator_rating, 2).unwrap();
+
+        let mut scrubber_candidates = bins.clone();
+        let mut current_bit = 0;
+
+        while scrubber_candidates.len() > 1 {
+            let one_bits_count = scrubber_candidates
+                .iter()
+                .map(|bits| bits.get(current_bit).unwrap())
+                .filter(|bit| bit == &&'1')
+                .count();
+
+            let zero_bits_count = scrubber_candidates
+                .iter()
+                .map(|bits| bits.get(current_bit).unwrap())
+                .filter(|bit| bit == &&'0')
+                .count();
+
+            scrubber_candidates = scrubber_candidates
+                .iter_mut()
+                .filter(|bits| {
+                    let bit = bits.get(current_bit).unwrap();
+
+                    bit == if zero_bits_count <= one_bits_count {
+                        &'0'
+                    } else {
+                        &'1'
+                    }
+                })
+                .map(|bits| bits.to_owned())
+                .collect();
+
+            current_bit += 1;
+        }
+
+        let scrubber_rating = scrubber_candidates
+            .get_mut(0)
+            .unwrap()
+            .iter()
+            .collect::<String>();
+
+        let scrubber_rating = u64::from_str_radix(&scrubber_rating, 2).unwrap();
+
+        oxygen_generator_rating * scrubber_rating
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (852500, 0)
+        (852500, 1007985)
     }
 }
 
