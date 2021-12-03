@@ -1,3 +1,5 @@
+use std::ops::Add;
+
 use itertools::Itertools;
 
 use super::Solution;
@@ -122,6 +124,70 @@ impl Solution for DayTwo {
 }
 
 pub struct DayThree;
+
+impl Solution for DayThree {
+    type Output = u64;
+
+    fn input() -> String {
+        include_str!("./inputs/3.txt").to_string()
+    }
+
+    fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
+        let input = input.as_ref();
+
+        let bins = input
+            .lines()
+            .filter(|s| !s.is_empty())
+            .map(|c| c.chars().collect::<Vec<char>>())
+            .collect::<Vec<_>>();
+
+        let bins_length = bins.len();
+        let mut ones_count = vec![0; bins[0].len()];
+
+        for bin in bins {
+            for (i, bit) in bin.iter().enumerate() {
+                if bit == &'1' {
+                    (*ones_count.get_mut(i).unwrap()) += 1;
+                }
+            }
+        }
+
+        let gamma_rate = ones_count
+            .iter()
+            .map(|one_count| {
+                if one_count >= &(bins_length / 2) {
+                    '1'
+                } else {
+                    '0'
+                }
+            })
+            .collect::<String>();
+
+        let epsilon_rate = gamma_rate
+            .clone()
+            .chars()
+            .map(|c| match c {
+                '0' => '1',
+                '1' => '0',
+                _ => panic!("Wrong digit"),
+            })
+            .collect::<String>();
+
+        let gamma_rate = u32::from_str_radix(&gamma_rate, 2).unwrap();
+        let epsilon_rate = u32::from_str_radix(&epsilon_rate, 2).unwrap();
+
+        (gamma_rate * epsilon_rate) as u64
+    }
+
+    fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
+        todo!()
+    }
+
+    fn expected_solutions() -> (Self::Output, Self::Output) {
+        (852500, 0)
+    }
+}
+
 pub struct DayFour;
 pub struct DayFive;
 pub struct DaySix;
