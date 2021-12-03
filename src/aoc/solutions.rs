@@ -221,13 +221,9 @@ impl Solution for DayThree {
                 bit == if one_count >= zero_count { '1' } else { '0' }
             });
 
-        dbg!(oxygen_generator_rating);
-
         let scrubber_rating = Self::filter_out_bits(bins, |bit, one_count, zero_count| {
             bit == if zero_count <= one_count { '0' } else { '1' }
         });
-
-        dbg!(scrubber_rating);
 
         oxygen_generator_rating * scrubber_rating
     }
