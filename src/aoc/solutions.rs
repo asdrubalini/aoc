@@ -351,7 +351,7 @@ impl Solution for DayFour {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (16674, 0)
     }
 }
 
