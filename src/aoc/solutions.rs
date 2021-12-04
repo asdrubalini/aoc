@@ -250,11 +250,44 @@ impl DayFour {
         let boards_raw = input.split("\n\n").skip(1);
         boards_raw.map(Board::new).collect()
     }
+
+    fn get_ordered_winners(input: &str) -> Vec<Board> {
+        let numbers = Self::parse_drawn_numbers(input);
+        let mut boards = Self::parse_boards(input);
+
+        let mut winners = vec![];
+
+        for i in 0..numbers.len() {
+            let drawn_numbers = numbers.get(0..=i).unwrap();
+
+            let current_winners = boards
+                .clone()
+                .iter()
+                .filter(|b| b.check_win(&drawn_numbers))
+                .map(|b| b.to_owned())
+                .collect::<Vec<_>>();
+
+            for winner in current_winners.iter() {
+                let mut winner = winner.clone();
+                winner.compute_score(drawn_numbers);
+                winners.push(winner);
+            }
+
+            boards = boards
+                .iter()
+                .filter(|board| !current_winners.contains(board))
+                .map(|b| b.to_owned())
+                .collect();
+        }
+
+        winners
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 struct Board {
     inner: Vec<Vec<u8>>,
+    winner_score: Option<u32>,
 }
 
 impl Board {
@@ -270,7 +303,10 @@ impl Board {
             .filter(|row| !row.is_empty())
             .collect::<Vec<_>>();
 
-        Self { inner }
+        Self {
+            inner,
+            winner_score: None,
+        }
     }
 
     fn check_win(&self, drawn_numbers: &[u8]) -> bool {
@@ -294,9 +330,7 @@ impl Board {
         false
     }
 
-    fn winner_score(&self, drawn_numbers: &[u8]) -> u32 {
-        assert!(self.check_win(drawn_numbers));
-
+    fn compute_score(&mut self, drawn_numbers: &[u8]) {
         let unmarked_sum: u32 = self
             .inner
             .iter()
@@ -305,7 +339,8 @@ impl Board {
             .map(|n| *n as u32)
             .sum();
 
-        unmarked_sum * (*drawn_numbers.last().unwrap() as u32)
+        let score = unmarked_sum * (*drawn_numbers.last().unwrap() as u32);
+        self.winner_score = Some(score);
     }
 }
 
@@ -319,35 +354,21 @@ impl Solution for DayFour {
     fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
         let input = input.as_ref();
 
-        let numbers = Self::parse_drawn_numbers(input);
-        let boards = Self::parse_boards(input);
-
-        let winner_score = (0..numbers.len())
-            .map(|i| {
-                let drawn_numbers = numbers.get(0..=i).unwrap();
-
-                let winner = boards
-                    .iter()
-                    .filter(|b| b.check_win(&drawn_numbers))
-                    .collect::<Vec<_>>();
-
-                if winner.len() > 0 {
-                    let winner = winner.get(0).unwrap();
-                    Some(winner.winner_score(drawn_numbers))
-                } else {
-                    None
-                }
-            })
-            .filter(|b| b.is_some())
-            .map(|b| b.unwrap())
-            .nth(0)
-            .unwrap();
-
-        winner_score
+        Self::get_ordered_winners(input)
+            .get(0)
+            .unwrap()
+            .winner_score
+            .unwrap()
     }
 
     fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
-        todo!()
+        let input = input.as_ref();
+
+        Self::get_ordered_winners(input)
+            .last()
+            .unwrap()
+            .winner_score
+            .unwrap()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
