@@ -16,7 +16,7 @@ macro_rules! test_day {
 
 #[cfg(test)]
 mod tests {
-    use super::aoc::{solutions::*, Solution};
+    use super::aoc::*;
     use paste::paste;
 
     test_day!(DayOne);

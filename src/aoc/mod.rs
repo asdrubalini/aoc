@@ -1,6 +1,16 @@
 use std::fmt::Debug;
 
-pub mod solutions;
+mod sonar_sweep;
+pub use sonar_sweep::DayOne;
+
+mod dive;
+pub use dive::DayTwo;
+
+mod binary_diagnostic;
+pub use binary_diagnostic::DayThree;
+
+mod bingo;
+pub use bingo::DayFour;
 
 pub trait Solution {
     type Output: Eq + Debug;
