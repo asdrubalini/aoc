@@ -20,8 +20,8 @@ impl DayTwo {
 impl Solution for DayTwo {
     type Output = i32;
 
-    fn input() -> String {
-        include_str!("./inputs/2.txt").to_string()
+    fn input() -> &'static str {
+        include_str!("./inputs/2.txt")
     }
 
     fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {

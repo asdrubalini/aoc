@@ -7,8 +7,8 @@ pub struct DayOne;
 impl Solution for DayOne {
     type Output = usize;
 
-    fn input() -> String {
-        include_str!("./inputs/1.txt").to_string()
+    fn input() -> &'static str {
+        include_str!("./inputs/1.txt")
     }
 
     fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {

@@ -114,8 +114,8 @@ impl DayFour {
 impl Solution for DayFour {
     type Output = u32;
 
-    fn input() -> String {
-        include_str!("./inputs/4.txt").to_string()
+    fn input() -> &'static str {
+        include_str!("./inputs/4.txt")
     }
 
     fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {

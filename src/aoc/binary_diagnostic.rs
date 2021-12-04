@@ -50,8 +50,8 @@ impl DayThree {
 impl Solution for DayThree {
     type Output = u64;
 
-    fn input() -> String {
-        include_str!("./inputs/3.txt").to_string()
+    fn input() -> &'static str {
+        include_str!("./inputs/3.txt")
     }
 
     fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {

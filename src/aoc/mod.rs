@@ -15,7 +15,7 @@ pub use bingo::DayFour;
 pub trait Solution {
     type Output: Eq + Debug;
 
-    fn input() -> String;
+    fn input() -> &'static str;
     fn solve_first<S: AsRef<str>>(input: S) -> Self::Output;
     fn solve_second<S: AsRef<str>>(input: S) -> Self::Output;
     fn expected_solutions() -> (Self::Output, Self::Output);
