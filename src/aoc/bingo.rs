@@ -11,7 +11,7 @@ impl Board {
         let inner = input
             .lines()
             .map(|line| {
-                line.split(" ")
+                line.split(' ')
                     .filter(|s| !s.is_empty())
                     .map(|n| n.parse::<u8>().unwrap())
                     .collect::<Vec<_>>()
@@ -66,7 +66,7 @@ impl DayFour {
     fn parse_drawn_numbers(input: &str) -> Vec<u8> {
         input
             .lines()
-            .nth(0)
+            .next()
             .unwrap()
             .split(',')
             .map(|n| n.parse::<u8>().unwrap())
@@ -90,7 +90,7 @@ impl DayFour {
             let current_winners = boards
                 .clone()
                 .iter()
-                .filter(|b| b.check_win(&drawn_numbers))
+                .filter(|b| b.check_win(drawn_numbers))
                 .map(|b| b.to_owned())
                 .collect::<Vec<_>>();
 
