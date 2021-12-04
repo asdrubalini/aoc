@@ -4,8 +4,6 @@ mod aoc;
 use aoc::{solutions::*, Solution};
 
 fn main() {
-    let input = DayThree::input();
-    let out = DayThree::solve_second(&input);
-
-    println!("{}", out);
+    let input = DayFour::input();
+    dbg!(DayFour::solve_first(&input));
 }

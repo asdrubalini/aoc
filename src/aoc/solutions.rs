@@ -234,6 +234,127 @@ impl Solution for DayThree {
 }
 
 pub struct DayFour;
+
+impl DayFour {
+    fn parse_drawn_numbers(input: &str) -> Vec<u8> {
+        input
+            .lines()
+            .nth(0)
+            .unwrap()
+            .split(',')
+            .map(|n| n.parse::<u8>().unwrap())
+            .collect()
+    }
+
+    fn parse_boards(input: &str) -> Vec<Board> {
+        let boards_raw = input.split("\n\n").skip(1);
+        boards_raw.map(Board::new).collect()
+    }
+}
+
+#[derive(Debug)]
+struct Board {
+    inner: Vec<Vec<u8>>,
+}
+
+impl Board {
+    fn new(input: &str) -> Self {
+        let inner = input
+            .lines()
+            .map(|line| {
+                line.split(" ")
+                    .filter(|s| !s.is_empty())
+                    .map(|n| n.parse::<u8>().unwrap())
+                    .collect::<Vec<_>>()
+            })
+            .filter(|row| !row.is_empty())
+            .collect::<Vec<_>>();
+
+        Self { inner }
+    }
+
+    fn check_win(&self, drawn_numbers: &[u8]) -> bool {
+        // check horizontally
+        for row in &self.inner {
+            // check for match
+            if row.iter().all(|elem| drawn_numbers.contains(elem)) {
+                return true;
+            }
+        }
+
+        // check vertically
+        for i in 0..self.inner.len() {
+            let mut col = self.inner.iter().map(|row| row.get(i).unwrap());
+            // check for match
+            if col.all(|elem| drawn_numbers.contains(elem)) {
+                return true;
+            }
+        }
+
+        false
+    }
+
+    fn winner_score(&self, drawn_numbers: &[u8]) -> u32 {
+        assert!(self.check_win(drawn_numbers));
+
+        let unmarked_sum: u32 = self
+            .inner
+            .iter()
+            .flatten()
+            .filter(|item| !drawn_numbers.contains(item))
+            .map(|n| *n as u32)
+            .sum();
+
+        unmarked_sum * (*drawn_numbers.last().unwrap() as u32)
+    }
+}
+
+impl Solution for DayFour {
+    type Output = u32;
+
+    fn input() -> String {
+        include_str!("./inputs/4.txt").to_string()
+    }
+
+    fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
+        let input = input.as_ref();
+
+        let numbers = Self::parse_drawn_numbers(input);
+        let boards = Self::parse_boards(input);
+
+        let winner_score = (0..numbers.len())
+            .map(|i| {
+                let drawn_numbers = numbers.get(0..=i).unwrap();
+
+                let winner = boards
+                    .iter()
+                    .filter(|b| b.check_win(&drawn_numbers))
+                    .collect::<Vec<_>>();
+
+                if winner.len() > 0 {
+                    let winner = winner.get(0).unwrap();
+                    Some(winner.winner_score(drawn_numbers))
+                } else {
+                    None
+                }
+            })
+            .filter(|b| b.is_some())
+            .map(|b| b.unwrap())
+            .nth(0)
+            .unwrap();
+
+        winner_score
+    }
+
+    fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
+        todo!()
+    }
+
+    fn expected_solutions() -> (Self::Output, Self::Output) {
+        (0, 0)
+    }
+}
+
 pub struct DayFive;
 pub struct DaySix;
 pub struct DaySeven;
