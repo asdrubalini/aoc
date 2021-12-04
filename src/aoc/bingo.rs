@@ -118,9 +118,7 @@ impl Solution for DayFour {
         include_str!("./inputs/4.txt")
     }
 
-    fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-
+    fn solve_first(input: &str) -> Self::Output {
         Self::get_ordered_winners(input)
             .get(0)
             .unwrap()
@@ -128,9 +126,7 @@ impl Solution for DayFour {
             .unwrap()
     }
 
-    fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-
+    fn solve_second(input: &str) -> Self::Output {
         Self::get_ordered_winners(input)
             .last()
             .unwrap()

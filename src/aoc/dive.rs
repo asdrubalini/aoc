@@ -24,9 +24,7 @@ impl Solution for DayTwo {
         include_str!("./inputs/2.txt")
     }
 
-    fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-
+    fn solve_first(input: &str) -> Self::Output {
         let mut horizontal = 0;
         let mut depth = 0;
 
@@ -42,9 +40,7 @@ impl Solution for DayTwo {
         horizontal * depth
     }
 
-    fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-
+    fn solve_second(input: &str) -> Self::Output {
         let mut horizontal = 0;
         let mut depth = 0;
         let mut aim = 0;

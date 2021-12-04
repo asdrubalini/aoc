@@ -3,7 +3,7 @@ use super::Solution;
 pub struct DayThree;
 
 impl DayThree {
-    fn get_bins(input: String) -> Vec<Vec<char>> {
+    fn get_bins(input: &str) -> Vec<Vec<char>> {
         input
             .lines()
             .filter(|s| !s.is_empty())
@@ -54,9 +54,8 @@ impl Solution for DayThree {
         include_str!("./inputs/3.txt")
     }
 
-    fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-        let bins = Self::get_bins(input.to_string());
+    fn solve_first(input: &str) -> Self::Output {
+        let bins = Self::get_bins(input);
 
         let bins_length = bins.len();
         let mut ones_count = vec![0; bins[0].len()];
@@ -95,9 +94,8 @@ impl Solution for DayThree {
         gamma_rate * epsilon_rate
     }
 
-    fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-        let bins = Self::get_bins(input.to_string());
+    fn solve_second(input: &str) -> Self::Output {
+        let bins = Self::get_bins(input);
 
         let oxygen_generator_rating =
             Self::filter_out_bits(bins.clone(), |bit, one_count, zero_count| {

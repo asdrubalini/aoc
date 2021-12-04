@@ -16,15 +16,15 @@ pub trait Solution {
     type Output: Eq + Debug;
 
     fn input() -> &'static str;
-    fn solve_first<S: AsRef<str>>(input: S) -> Self::Output;
-    fn solve_second<S: AsRef<str>>(input: S) -> Self::Output;
+    fn solve_first(input: &str) -> Self::Output;
+    fn solve_second(input: &str) -> Self::Output;
     fn expected_solutions() -> (Self::Output, Self::Output);
 
     fn assert_solutions() {
         let input = Self::input();
 
-        let first = Self::solve_first(&input);
-        let second = Self::solve_second(&input);
+        let first = Self::solve_first(input);
+        let second = Self::solve_second(input);
 
         assert_eq!(first, Self::expected_solutions().0);
         assert_eq!(second, Self::expected_solutions().1);

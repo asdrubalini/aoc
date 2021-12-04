@@ -11,14 +11,12 @@ impl Solution for DayOne {
         include_str!("./inputs/1.txt")
     }
 
-    fn solve_first<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-
+    fn solve_first(input: &str) -> Self::Output {
         // Split by line
         let items = input
             .lines()
             .filter(|s| !s.is_empty())
-            .map(|s| s.parse::<u32>().unwrap());
+            .map(|s| s.parse::<u16>().unwrap());
 
         items
             .tuple_windows()
@@ -26,14 +24,12 @@ impl Solution for DayOne {
             .count()
     }
 
-    fn solve_second<S: AsRef<str>>(input: S) -> Self::Output {
-        let input = input.as_ref();
-
+    fn solve_second(input: &str) -> Self::Output {
         // Split by line
         let items = input
             .lines()
             .filter(|s| !s.is_empty())
-            .map(|s| s.parse::<u32>().unwrap());
+            .map(|s| s.parse::<u16>().unwrap());
 
         items
             .tuple_windows()

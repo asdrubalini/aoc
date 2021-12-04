@@ -1,6 +1,6 @@
 #![allow(dead_code, unused_macros)]
 
-mod aoc;
+pub mod aoc;
 
 /// Generate tests for day n
 macro_rules! test_day {
