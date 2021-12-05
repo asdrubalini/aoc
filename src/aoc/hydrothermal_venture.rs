@@ -1,10 +1,15 @@
-use std::fmt::Debug;
+use std::{
+    fmt::{Debug, Display},
+    mem::swap,
+};
+
+use itertools::Itertools;
 
 use super::Solution;
 
 pub struct DayFive;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, PartialOrd)]
 struct Position {
     x: u32,
     y: u32,
@@ -28,10 +33,14 @@ impl DayFive {
             .map(|line| {
                 let mut s = line.split(" -> ");
 
-                let begin = s.next().unwrap();
-                let end = s.next().unwrap();
+                let mut begin = Position::new(s.next().unwrap());
+                let mut end = Position::new(s.next().unwrap());
 
-                (Position::new(begin), Position::new(end))
+                if begin > end {
+                    swap(&mut begin, &mut end);
+                }
+
+                (begin, end)
             })
             .collect()
     }
@@ -41,12 +50,26 @@ struct Matrix {
     inner: Vec<Vec<u32>>,
 }
 
+impl Display for Matrix {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let display_str = self
+            .inner
+            .iter()
+            .map(|row| {
+                row.iter()
+                    .map(|item| format!("{} ", item))
+                    .collect::<String>()
+            })
+            .join("\n");
+
+        write!(f, "{}", display_str)
+    }
+}
+
 impl Matrix {
     fn new(size_x: usize, size_y: usize) -> Self {
-        let surface_matrix = vec![vec![0; size_x]; size_y];
-
         Self {
-            inner: surface_matrix,
+            inner: vec![vec![0; size_x]; size_y],
         }
     }
 
@@ -59,7 +82,7 @@ impl Solution for DayFive {
     type Output = u32;
 
     fn input() -> &'static str {
-        include_str!("./inputs/5.txt")
+        include_str!("./inputs/example.txt")
     }
 
     fn solve_first(input: &str) -> Self::Output {
@@ -81,24 +104,12 @@ impl Solution for DayFive {
 
         for (begin, end) in positions.iter() {
             let positions = if begin.x == end.x {
-                let range = if begin.y > end.y {
-                    end.y..=begin.y
-                } else {
-                    begin.y..=end.y
-                };
-
-                range
+                (begin.y..=end.y)
                     .into_iter()
                     .map(|y| Position { x: begin.x, y })
                     .collect::<Vec<_>>()
             } else if begin.y == end.y {
-                let range = if begin.x > end.x {
-                    end.x..=begin.x
-                } else {
-                    begin.x..=end.x
-                };
-
-                range
+                (begin.x..=end.x)
                     .into_iter()
                     .map(|x| Position { x, y: begin.y })
                     .collect::<Vec<_>>()
@@ -120,10 +131,46 @@ impl Solution for DayFive {
     }
 
     fn solve_second(input: &str) -> Self::Output {
-        todo!()
+        let positions = Self::parse_input(input);
+
+        let flattened = positions
+            .iter()
+            .map(|(begin, end)| vec![begin, end])
+            .flatten();
+
+        let max_x = flattened.clone().map(|pos| pos.x).max().unwrap() as usize + 1;
+        let max_y = flattened.map(|pos| pos.y).max().unwrap() as usize + 1;
+
+        let mut matrix = Matrix::new(max_x, max_y);
+
+        for (begin, end) in positions.iter() {
+            let delta_x = end.x - begin.x;
+            let delta_y = end.y - begin.y;
+
+            let positions = (0..delta_x)
+                .into_iter()
+                .map(|delta| Position {
+                    x: begin.x + delta,
+                    y: begin.y + delta,
+                })
+                .collect::<Vec<_>>();
+
+            for pos in positions {
+                matrix.increment(&pos);
+            }
+        }
+
+        println!("{}", matrix);
+
+        matrix
+            .inner
+            .iter()
+            .flatten()
+            .filter(|item| **item >= 2)
+            .count() as u32
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (5835, 0)
     }
 }

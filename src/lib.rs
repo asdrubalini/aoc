@@ -23,4 +23,5 @@ mod tests {
     test_day!(DayTwo);
     test_day!(DayThree);
     test_day!(DayFour);
+    test_day!(DayFive);
 }
