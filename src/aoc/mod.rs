@@ -12,6 +12,9 @@ pub use binary_diagnostic::DayThree;
 mod bingo;
 pub use bingo::DayFour;
 
+mod hydrothermal_venture;
+pub use hydrothermal_venture::DayFive;
+
 pub trait Solution {
     type Output: Eq + Debug;
 

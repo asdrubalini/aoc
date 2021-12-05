@@ -1,5 +1,8 @@
 #![allow(dead_code)]
 
-mod aoc;
+use advent_of_code_2021::aoc::{DayFive, Solution};
 
-fn main() {}
+fn main() {
+    let input = DayFive::input();
+    dbg!(DayFive::solve_first(input));
+}
