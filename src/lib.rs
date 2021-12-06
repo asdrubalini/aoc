@@ -1,4 +1,4 @@
-#![allow(dead_code, unused_macros)]
+#![allow(dead_code, unused_macros, unused_variables)]
 
 pub mod aoc;
 
@@ -24,4 +24,5 @@ mod tests {
     test_day!(DayThree);
     test_day!(DayFour);
     test_day!(DayFive);
+    test_day!(DaySix);
 }

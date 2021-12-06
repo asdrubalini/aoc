@@ -1,12 +1,12 @@
 #![allow(dead_code)]
 
-use advent_of_code_2021::aoc::{DayFive, Solution};
+use advent_of_code_2021::aoc::{DaySix, Solution};
 
 fn main() {
-    let input = DayFive::input();
+    let input = DaySix::input();
 
-    let first = DayFive::solve_first(input);
-    let second = DayFive::solve_second(input);
+    let first = DaySix::solve_first(input);
+    let second = DaySix::solve_second(input);
 
     dbg!(first);
     dbg!(second);

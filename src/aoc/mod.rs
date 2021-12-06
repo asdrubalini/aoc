@@ -15,6 +15,9 @@ pub use bingo::DayFour;
 mod hydrothermal_venture;
 pub use hydrothermal_venture::DayFive;
 
+mod lanternfish;
+pub use lanternfish::DaySix;
+
 pub trait Solution {
     type Output: Eq + Debug;
 
