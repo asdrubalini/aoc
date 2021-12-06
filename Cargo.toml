@@ -15,5 +15,17 @@ name = "sonar_sweep"
 harness = false
 
 [[bench]]
+name = "dive"
+harness = false
+
+[[bench]]
 name = "binary_diagnostic"
+harness = false
+
+[[bench]]
+name = "bingo"
+harness = false
+
+[[bench]]
+name = "hydrothermal_venture"
 harness = false
