@@ -1,0 +1,24 @@
+Benchmarking DayOne...
+part_one...	58.091µs to run
+part_two...	37.044µs to run
+
+Benchmarking DayTwo...
+part_one...	66.155µs to run
+part_two...	64.388µs to run
+
+Benchmarking DayThree...
+part_one...	195.064µs to run
+part_two...	249.043µs to run
+
+Benchmarking DayFour...
+part_one...	3.701467ms to run
+part_two...	3.715524ms to run
+
+Benchmarking DayFive...
+part_one...	1.481834ms to run
+part_two...	1.791459ms to run
+
+Benchmarking DaySix...
+part_one...	7.784µs to run
+part_two...	11.977µs to run
+
