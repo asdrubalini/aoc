@@ -91,16 +91,24 @@ impl Plane {
         if delta_x == 0 && delta_y > 0 {
             // Vertical
             (0..=delta_y)
-                .map(|pos_y| Cell::new(segment_begin.x, segment_begin.y + (pos_y * inc_y)))
+                .map(|delta_y| Cell::new(segment_begin.x, segment_begin.y + (delta_y * inc_y)))
                 .collect()
         } else if delta_y == 0 && delta_x > 0 {
             // Horizontal
             (0..=delta_x)
-                .map(|pos_x| Cell::new(segment_begin.x + (pos_x * inc_x), segment_begin.y))
+                .map(|delta_x| Cell::new(segment_begin.x + (delta_x * inc_x), segment_begin.y))
                 .collect()
         } else {
             // Diagonal
-            todo!()
+            assert_eq!(delta_x, delta_y);
+            (0..=delta_x)
+                .map(|delta| {
+                    Cell::new(
+                        segment_begin.x + (delta * inc_x),
+                        segment_begin.y + (delta * inc_y),
+                    )
+                })
+                .collect()
         }
     }
 
@@ -191,6 +199,6 @@ impl Solution for DayFive {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (5835, 0)
+        (5835, 17013)
     }
 }
