@@ -45,7 +45,8 @@ pub trait Solution {
     fn benchmark() {
         let type_name = type_name::<Self>().split("::").last().unwrap();
 
-        println!("Benchmarking {}...", type_name);
+        println!("## Benchmarking {}...", type_name);
+        print!("```");
 
         let input = Self::input();
 
@@ -74,6 +75,6 @@ pub trait Solution {
         let elapsed = Duration::from_nanos(elapsed.round() as u64);
 
         println!("part_two...\t{:?} to run", elapsed);
-        println!();
+        println!("```");
     }
 }

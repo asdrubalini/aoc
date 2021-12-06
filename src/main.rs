@@ -7,6 +7,8 @@ fn main() {}
 
 #[cfg(not(debug_assertions))]
 fn main() {
+    println!("# Benchmarks:");
+
     DayOne::benchmark();
     DayTwo::benchmark();
     DayThree::benchmark();
