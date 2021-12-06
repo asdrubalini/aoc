@@ -4,7 +4,6 @@ use super::Solution;
 
 #[derive(Debug)]
 struct LanternfishGroup {
-    counter: u32,
     fishes: Vec<u64>,
 }
 
@@ -17,18 +16,13 @@ impl LanternfishGroup {
             *counter += 1;
         }
 
-        Self { counter: 0, fishes }
+        Self { fishes }
     }
 
     fn advance_all(&mut self) {
-        self.counter += 1;
-        dbg!(self.counter);
-
         let fishes = replace(&mut self.fishes, vec![0; 9]);
 
         for (timer, count) in fishes.into_iter().enumerate() {
-            println!("{} -> {}", timer, count);
-
             match timer {
                 0 => {
                     let counter = self.fishes.get_mut(6).unwrap();
@@ -44,9 +38,6 @@ impl LanternfishGroup {
                 }
             }
         }
-
-        // dbg!(&self.fishes);
-        println!();
     }
 }
 
