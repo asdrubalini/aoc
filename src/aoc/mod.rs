@@ -4,23 +4,23 @@ use std::{
     time::{Duration, Instant},
 };
 
-mod sonar_sweep;
-pub use sonar_sweep::DayOne;
+mod day_one;
+pub use day_one::DayOne;
 
-mod dive;
-pub use dive::DayTwo;
+mod day_two;
+pub use day_two::DayTwo;
 
-mod binary_diagnostic;
-pub use binary_diagnostic::DayThree;
+mod day_three;
+pub use day_three::DayThree;
 
-mod bingo;
-pub use bingo::DayFour;
+mod day_four;
+pub use day_four::DayFour;
 
-mod hydrothermal_venture;
-pub use hydrothermal_venture::DayFive;
+mod day_five;
+pub use day_five::DayFive;
 
-mod lanternfish;
-pub use lanternfish::DaySix;
+mod day_six;
+pub use day_six::DaySix;
 
 const SAMPLE_SIZE: usize = 128;
 
