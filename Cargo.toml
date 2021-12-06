@@ -6,26 +6,3 @@ edition = "2021"
 [dependencies]
 itertools = "0.10"
 paste = "1.0"
-
-[dev-dependencies]
-criterion = { version = "0.3", features = [ "html_reports" ] }
-
-[[bench]]
-name = "sonar_sweep"
-harness = false
-
-[[bench]]
-name = "dive"
-harness = false
-
-[[bench]]
-name = "binary_diagnostic"
-harness = false
-
-[[bench]]
-name = "bingo"
-harness = false
-
-[[bench]]
-name = "hydrothermal_venture"
-harness = false
