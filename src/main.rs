@@ -1,13 +1,16 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_imports)]
 
-use advent_of_code_2021::aoc::{DaySix, Solution};
+use advent_of_code_2021::aoc::*;
 
+#[cfg(debug_assertions)]
+fn main() {}
+
+#[cfg(not(debug_assertions))]
 fn main() {
-    let input = DaySix::input();
-
-    let first = DaySix::solve_first(input);
-    let second = DaySix::solve_second(input);
-
-    dbg!(first);
-    dbg!(second);
+    DayOne::benchmark();
+    DayTwo::benchmark();
+    DayThree::benchmark();
+    DayFour::benchmark();
+    DayFive::benchmark();
+    DaySix::benchmark();
 }
