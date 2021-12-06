@@ -42,7 +42,7 @@ pub trait Solution {
         assert_eq!(second, Self::expected_solutions().1);
     }
 
-    fn benchmark() {
+    fn benchmark() -> u64 {
         let type_name = type_name::<Self>().split("::").last().unwrap();
 
         print!("| {} ", type_name);
@@ -58,9 +58,9 @@ pub trait Solution {
             })
             .sum::<u128>() as f64
             / SAMPLE_SIZE as f64;
-        let elapsed = Duration::from_nanos(elapsed.round() as u64);
+        let elapsed_first = Duration::from_nanos(elapsed.round() as u64);
 
-        print!("| {:?} ", elapsed);
+        print!("| {:?} ", elapsed_first);
 
         let elapsed: f64 = (0..SAMPLE_SIZE)
             .into_iter()
@@ -71,8 +71,10 @@ pub trait Solution {
             })
             .sum::<u128>() as f64
             / SAMPLE_SIZE as f64;
-        let elapsed = Duration::from_nanos(elapsed.round() as u64);
+        let elapsed_second = Duration::from_nanos(elapsed.round() as u64);
 
-        println!("| {:?} |", elapsed);
+        println!("| {:?} |", elapsed_second);
+
+        (elapsed_first.as_nanos() + elapsed_second.as_nanos()) as u64
     }
 }
