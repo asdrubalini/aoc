@@ -6,8 +6,8 @@ fn main() {
     let input = DayFive::input();
 
     let first = DayFive::solve_first(input);
-    let second = DayFive::solve_second(input);
+    // let second = DayFive::solve_second(input);
 
     dbg!(first);
-    dbg!(second);
+    //  dbg!(second);
 }
