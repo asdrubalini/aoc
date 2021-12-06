@@ -1,7 +1,7 @@
-use std::{
-    fmt::{Debug, Display},
-    mem::swap,
-};
+/// Hydrothermal venture
+///
+/// We have a list of segments defined by the coordinates of the two extreme points on a 2D matrix.
+use std::fmt::{Debug, Display};
 
 use itertools::Itertools;
 
@@ -11,8 +11,8 @@ pub struct DayFive;
 
 #[derive(Debug, PartialEq, PartialOrd)]
 struct Position {
-    x: u32,
-    y: u32,
+    x: i32,
+    y: i32,
 }
 
 impl Position {
@@ -24,6 +24,10 @@ impl Position {
             y: coord.next().unwrap().parse().unwrap(),
         }
     }
+
+    fn distance(&self, other: &Self) -> f64 {
+        (((self.x - other.x).pow(2) + (self.y - other.y).pow(2)) as f64).sqrt()
+    }
 }
 
 impl DayFive {
@@ -33,12 +37,8 @@ impl DayFive {
             .map(|line| {
                 let mut s = line.split(" -> ");
 
-                let mut begin = Position::new(s.next().unwrap());
-                let mut end = Position::new(s.next().unwrap());
-
-                if begin > end {
-                    swap(&mut begin, &mut end);
-                }
+                let begin = Position::new(s.next().unwrap());
+                let end = Position::new(s.next().unwrap());
 
                 (begin, end)
             })
@@ -57,7 +57,13 @@ impl Display for Matrix {
             .iter()
             .map(|row| {
                 row.iter()
-                    .map(|item| format!("{} ", item))
+                    .map(|item| {
+                        if *item == 0 {
+                            ".".to_string()
+                        } else {
+                            format!("{}", item)
+                        }
+                    })
                     .collect::<String>()
             })
             .join("\n");
@@ -75,6 +81,44 @@ impl Matrix {
 
     fn increment(&mut self, pos: &Position) {
         self.inner[pos.y as usize][pos.x as usize] += 1;
+    }
+
+    fn get_touch_points(&self, begin: &Position, end: &Position) -> Vec<Position> {
+        let total_distance = begin.distance(end);
+        let mut touch_points = vec![];
+
+        // Very slow version which checks every point on the matrix
+        for (x, row) in (&self.inner).iter().enumerate() {
+            for (y, _) in row.iter().enumerate() {
+                // Here x and y is every point in the matrix
+                let current_point = Position {
+                    x: x as i32,
+                    y: y as i32,
+                };
+
+                let difference =
+                    current_point.distance(begin) + current_point.distance(end) - total_distance;
+
+                println!("{}", difference);
+
+                if difference > -f64::EPSILON && difference < f64::EPSILON {
+                    touch_points.push(current_point);
+                }
+            }
+        }
+
+        touch_points
+    }
+
+    fn put_positions(&mut self, positions: &[(Position, Position)]) {
+        for (begin, end) in positions {
+            // Find which point belonging to a segment touches the matrix
+            let touch_points = self.get_touch_points(begin, end);
+
+            for point in touch_points {
+                self.increment(&point);
+            }
+        }
     }
 }
 
@@ -101,26 +145,7 @@ impl Solution for DayFive {
         let max_y = flattened.map(|pos| pos.y).max().unwrap() as usize + 1;
 
         let mut matrix = Matrix::new(max_x, max_y);
-
-        for (begin, end) in positions.iter() {
-            let positions = if begin.x == end.x {
-                (begin.y..=end.y)
-                    .into_iter()
-                    .map(|y| Position { x: begin.x, y })
-                    .collect::<Vec<_>>()
-            } else if begin.y == end.y {
-                (begin.x..=end.x)
-                    .into_iter()
-                    .map(|x| Position { x, y: begin.y })
-                    .collect::<Vec<_>>()
-            } else {
-                panic!("Should not happen");
-            };
-
-            for pos in positions {
-                matrix.increment(&pos);
-            }
-        }
+        matrix.put_positions(&positions);
 
         matrix
             .inner
@@ -142,23 +167,7 @@ impl Solution for DayFive {
         let max_y = flattened.map(|pos| pos.y).max().unwrap() as usize + 1;
 
         let mut matrix = Matrix::new(max_x, max_y);
-
-        for (begin, end) in positions.iter() {
-            let delta_x = end.x - begin.x;
-            let delta_y = end.y - begin.y;
-
-            let positions = (0..delta_x)
-                .into_iter()
-                .map(|delta| Position {
-                    x: begin.x + delta,
-                    y: begin.y + delta,
-                })
-                .collect::<Vec<_>>();
-
-            for pos in positions {
-                matrix.increment(&pos);
-            }
-        }
+        matrix.put_positions(&positions);
 
         println!("{}", matrix);
 
