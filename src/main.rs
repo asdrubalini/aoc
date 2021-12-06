@@ -9,6 +9,9 @@ fn main() {}
 fn main() {
     println!("# Benchmarks:");
 
+    println!("| Day | First part | Second part |");
+    println!("| --- | --- | --- |");
+
     DayOne::benchmark();
     DayTwo::benchmark();
     DayThree::benchmark();
