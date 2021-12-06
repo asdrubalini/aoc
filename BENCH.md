@@ -1,6 +1,3 @@
-# advent-of-code
-
-Run tests: `cargo test`
 # Benchmarks:
 | Day | First part | Second part |
 | --- | --- | --- |
