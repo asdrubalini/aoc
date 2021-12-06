@@ -72,6 +72,15 @@ impl Plane {
         let delta_x = (segment_end.x - segment_begin.x).abs();
         let delta_y = (segment_end.y - segment_begin.y).abs();
 
+        let delta = if delta_x > 0 {
+            delta_x
+        } else if delta_y > 0 {
+            delta_y
+        } else {
+            panic!("Should not happen");
+        };
+
+        // Wether increment is positive, negative or zero for x
         let inc_x = if segment_end.x - segment_begin.x > 0 {
             1
         } else if segment_end.x - segment_begin.x < 0 {
@@ -80,6 +89,7 @@ impl Plane {
             0
         };
 
+        // Wether increment is positive, negative or zero for y
         let inc_y = if segment_end.y - segment_begin.y > 0 {
             1
         } else if segment_end.y - segment_begin.y < 0 {
@@ -88,28 +98,14 @@ impl Plane {
             0
         };
 
-        if delta_x == 0 && delta_y > 0 {
-            // Vertical
-            (0..=delta_y)
-                .map(|delta_y| Cell::new(segment_begin.x, segment_begin.y + (delta_y * inc_y)))
-                .collect()
-        } else if delta_y == 0 && delta_x > 0 {
-            // Horizontal
-            (0..=delta_x)
-                .map(|delta_x| Cell::new(segment_begin.x + (delta_x * inc_x), segment_begin.y))
-                .collect()
-        } else {
-            // Diagonal
-            assert_eq!(delta_x, delta_y);
-            (0..=delta_x)
-                .map(|delta| {
-                    Cell::new(
-                        segment_begin.x + (delta * inc_x),
-                        segment_begin.y + (delta * inc_y),
-                    )
-                })
-                .collect()
-        }
+        (0..=delta)
+            .map(|delta| {
+                Cell::new(
+                    segment_begin.x + (delta * inc_x),
+                    segment_begin.y + (delta * inc_y),
+                )
+            })
+            .collect()
     }
 
     fn increment_positions(&mut self, positions: &[(Cell, Cell)]) {
@@ -170,8 +166,6 @@ impl Solution for DayFive {
         let mut matrix = Plane::new(size_x, size_y);
         matrix.increment_positions(&segments);
 
-        println!("Matrix for first {}", matrix);
-
         matrix
             .inner
             .iter()
@@ -187,8 +181,6 @@ impl Solution for DayFive {
 
         let mut matrix = Plane::new(size_x, size_y);
         matrix.increment_positions(&segments);
-
-        println!("Matrix for second {}", matrix);
 
         matrix
             .inner
