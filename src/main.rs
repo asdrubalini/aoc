@@ -23,5 +23,5 @@ fn main() {
 
     let total_time = Duration::from_nanos(total_time_ns);
 
-    println!("Total: `{:?}`", total_time);
+    println!("\n\nTotal: `{:?}`", total_time);
 }
