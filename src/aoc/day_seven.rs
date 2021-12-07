@@ -13,6 +13,16 @@ impl DaySeven {
             .map(|initial_pos| (*initial_pos as i32 - position as i32).abs() as u64)
             .sum()
     }
+
+    fn compute_cost_corrected_by_crabs(position: u64, initial_positions: &[u64]) -> u64 {
+        initial_positions
+            .into_iter()
+            .map(|initial_pos| {
+                let distance = (*initial_pos as i32 - position as i32).abs() as u64;
+                (1..=distance).into_iter().sum::<u64>()
+            })
+            .sum()
+    }
 }
 
 impl Solution for DaySeven {
@@ -35,7 +45,15 @@ impl Solution for DaySeven {
     }
 
     fn solve_second(input: &str) -> Self::Output {
-        0
+        let input = Self::parse_input(input);
+
+        let max_width = *input.iter().max().unwrap();
+
+        (0..=max_width)
+            .into_iter()
+            .map(|pos| Self::compute_cost_corrected_by_crabs(pos, &input))
+            .min()
+            .unwrap()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {

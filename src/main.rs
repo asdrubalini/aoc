@@ -5,9 +5,9 @@ use advent_of_code_2021::aoc::*;
 #[cfg(debug_assertions)]
 fn main() {
     let input = DaySeven::input();
-    let first = DaySeven::solve_first(input);
+    let solution = DaySeven::solve_second(input);
 
-    println!("{}", first);
+    println!("{}", solution);
 }
 
 #[cfg(not(debug_assertions))]
