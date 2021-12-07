@@ -19,7 +19,7 @@ impl DaySeven {
             .into_iter()
             .map(|initial_pos| {
                 let distance = (*initial_pos as i32 - position as i32).abs() as u64;
-                (1..=distance).into_iter().sum::<u64>()
+                ((distance.pow(2) + distance) as f32 / 2.).floor() as u64
             })
             .sum()
     }
@@ -57,6 +57,6 @@ impl Solution for DaySeven {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (348664, 0)
+        (348664, 100220525)
     }
 }
