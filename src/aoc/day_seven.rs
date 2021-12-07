@@ -10,8 +10,8 @@ impl DaySeven {
     fn compute_cost(position: u64, initial_positions: &[u64]) -> u64 {
         initial_positions
             .into_iter()
-            .map(|initial_pos| (*initial_pos as i32 - position as i32).abs() as u64)
-            .sum()
+            .map(|initial_pos| (*initial_pos as i32 - position as i32).abs() as u32)
+            .sum::<u32>() as u64
     }
 
     fn compute_cost_corrected_by_crabs(position: u64, initial_positions: &[u64]) -> u64 {
