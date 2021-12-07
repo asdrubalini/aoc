@@ -3,7 +3,12 @@
 use advent_of_code_2021::aoc::*;
 
 #[cfg(debug_assertions)]
-fn main() {}
+fn main() {
+    let input = DaySeven::input();
+    let first = DaySeven::solve_first(input);
+
+    println!("{}", first);
+}
 
 #[cfg(not(debug_assertions))]
 fn main() {
@@ -19,7 +24,8 @@ fn main() {
         + DayThree::benchmark()
         + DayFour::benchmark()
         + DayFive::benchmark()
-        + DaySix::benchmark();
+        + DaySix::benchmark()
+        + DaySeven::benchmark();
 
     let total_time = Duration::from_nanos(total_time_ns);
 
