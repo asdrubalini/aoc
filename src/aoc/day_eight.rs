@@ -63,8 +63,6 @@ impl Solution for DayEight {
                     .map(|s| s.to_owned())
                     .collect::<Vec<_>>();
 
-                println!("{:?}", easy_digits);
-
                 let easy_digits_in_output = output_digits.iter().filter(|output_digit| {
                     easy_digits
                         .iter()
@@ -74,9 +72,6 @@ impl Solution for DayEight {
                         .count()
                         > 0
                 });
-
-                // let ciao = easy_digits_in_output.clone().collect::<Vec<_>>();
-                // println!("{:?}", ciao);
 
                 easy_digits_in_output.count()
             })
@@ -90,6 +85,6 @@ impl Solution for DayEight {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (278, 0)
     }
 }
