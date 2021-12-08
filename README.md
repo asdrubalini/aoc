@@ -4,13 +4,13 @@ Run tests: `cargo test`
 # Benchmarks:
 | Day | First part | Second part |
 | --- | --- | --- |
-| DayOne | 36.76µs | 36.956µs |
-| DayTwo | 68.59µs | 67.461µs |
-| DayThree | 189.472µs | 269.659µs |
-| DayFour | 3.561158ms | 3.571559ms |
-| DayFive | 1.490078ms | 1.799766ms |
-| DaySix | 7.798µs | 13.072µs |
-| DaySeven | 487.504µs | 1.39758ms |
+| DayOne | 114.88µs | 101.169µs |
+| DayTwo | 172.012µs | 165.262µs |
+| DayThree | 202.367µs | 252.059µs |
+| DayFour | 3.698113ms | 3.831126ms |
+| DayFive | 2.244741ms | 2.634593ms |
+| DaySix | 7.211µs | 11.493µs |
+| DaySeven | 487.052µs | 1.40451ms |
 
 
-Total: `12.997413ms`
+Total: `15.326588ms`
