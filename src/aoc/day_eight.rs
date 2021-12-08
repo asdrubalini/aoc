@@ -28,6 +28,10 @@ impl DayEight {
     }
 
     fn compare_digits_unoredered(this: &str, that: &str) -> bool {
+        if this.len() != that.len() {
+            return false;
+        }
+
         this.chars().filter(|chr| that.contains(*chr)).count() == that.len()
     }
 }
@@ -36,7 +40,7 @@ impl Solution for DayEight {
     type Output = u32;
 
     fn input() -> &'static str {
-        include_str!("./inputs/example.txt")
+        include_str!("./inputs/8.txt")
     }
 
     fn solve_first(input: &str) -> Self::Output {
@@ -59,6 +63,8 @@ impl Solution for DayEight {
                     .map(|s| s.to_owned())
                     .collect::<Vec<_>>();
 
+                println!("{:?}", easy_digits);
+
                 let easy_digits_in_output = output_digits.iter().filter(|output_digit| {
                     easy_digits
                         .iter()
@@ -69,8 +75,8 @@ impl Solution for DayEight {
                         > 0
                 });
 
-                let ciao = easy_digits_in_output.clone().collect::<Vec<_>>();
-                println!("{:?}", ciao);
+                // let ciao = easy_digits_in_output.clone().collect::<Vec<_>>();
+                // println!("{:?}", ciao);
 
                 easy_digits_in_output.count()
             })
