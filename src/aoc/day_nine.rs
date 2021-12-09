@@ -4,10 +4,11 @@ use super::Solution;
 
 pub struct DayNine;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 struct Point {
     x: usize,
     y: usize,
+    height: u8,
 }
 
 impl Point {
@@ -66,42 +67,49 @@ impl Matrix {
     }
 
     #[inline]
-    fn get(&self, point: Point) -> u8 {
-        self.inner[point.y][point.x]
+    fn get(&self, x: usize, y: usize) -> Point {
+        Point {
+            height: self.inner[y][x],
+            x,
+            y,
+        }
     }
 
     /// Get `point` neighbors
     #[inline]
-    fn get_neighbor(&self, point: Point) -> Vec<(u8, Point)> {
+    fn get_neighbor(&self, point: Point) -> Vec<Point> {
         let mut neighbors = vec![];
 
         if point.x > 0 {
             let next_point = point.to_left();
-            neighbors.push((self.get(next_point), next_point));
+            neighbors.push(self.get(next_point.x, next_point.y));
         }
 
         if point.x + 1 < self.width {
             let next_point = point.to_right();
-            neighbors.push((self.get(next_point), next_point));
+            neighbors.push(self.get(next_point.x, next_point.y));
         }
 
         if point.y > 0 {
             let next_point = point.to_bottom();
-            neighbors.push((self.get(next_point), next_point));
+            neighbors.push(self.get(next_point.x, next_point.y));
         }
 
         if point.y + 1 < self.height {
             let next_point = point.to_top();
-            neighbors.push((self.get(next_point), next_point));
+            neighbors.push(self.get(next_point.x, next_point.y));
         }
 
         neighbors
     }
 
+    /// Get an iterator that finds all the neighbors
     fn neighbors(&self) -> Neighbors {
+        let start_point = self.get(0, 0);
+
         Neighbors {
             matrix: self,
-            current_point: Point { x: 0, y: 0 },
+            current_point: start_point,
         }
     }
 
@@ -155,28 +163,25 @@ impl Basin<'_> {
     fn compute_size(&self) -> u32 {
         // For the current `self.low_point`, find its neighbors, filter out those with an height bigger than nine,
         // then for each point find its neighbors again until no one is left.
-        let mut known_points: Vec<Point> = vec![self.start_point];
+        let mut basin_points: Vec<Point> = vec![self.start_point];
         let mut basins_queue: Vec<Point> = vec![self.start_point];
-        let mut basins_size = 1;
 
         while basins_queue.len() > 0 {
             let current_point = basins_queue.pop().unwrap();
-            if !known_points.contains(&current_point) {
-                known_points.push(current_point);
-            }
+            basin_points.push(current_point);
 
             let neighbors = self.matrix.get_neighbor(current_point);
             let valid_neighbors = neighbors
                 .iter()
                 .filter(|point| point.0 < 9)
-                .filter(|point| !known_points.contains(&point.1))
+                .filter(|point| !basin_points.contains(&point.1))
                 .collect::<Vec<_>>();
 
-            basins_size += valid_neighbors.len() as u32;
             basins_queue.extend(valid_neighbors.iter().map(|point| point.1));
         }
 
-        known_points.len() as u32
+        // Remove duplicate points and then get the size
+        basin_points.into_iter().unique().count() as u32
     }
 }
 
