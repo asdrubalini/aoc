@@ -14,7 +14,8 @@ fn main() {
         + DayFour::benchmark()
         + DayFive::benchmark()
         + DaySix::benchmark()
-        + DaySeven::benchmark();
+        + DaySeven::benchmark()
+        + DayEight::benchmark();
 
     let total_time = Duration::from_nanos(total_time_ns);
 
