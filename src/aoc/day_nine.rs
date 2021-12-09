@@ -219,6 +219,6 @@ impl Solution for DayNine {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (516, 0)
+        (516, 1023660)
     }
 }

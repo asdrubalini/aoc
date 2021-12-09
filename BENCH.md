@@ -1,15 +1,15 @@
 # Benchmarks:
 | Day | First part | Second part |
 | --- | --- | --- |
-| DayOne | 36.535µs | 39.488µs |
-| DayTwo | 69.303µs | 68.199µs |
-| DayThree | 186.465µs | 245.234µs |
-| DayFour | 3.616618ms | 3.634225ms |
-| DayFive | 1.549927ms | 1.875085ms |
-| DaySix | 7.501µs | 11.632µs |
-| DaySeven | 489.105µs | 5.18352ms |
-| DayEight | 741.149µs | 902.484µs |
-| DayNine | 417.957µs | 2.443862ms |
+| DayOne | 97.318µs | 114.431µs |
+| DayTwo | 210.518µs | 194.881µs |
+| DayThree | 194.172µs | 243.422µs |
+| DayFour | 3.552122ms | 3.561748ms |
+| DayFive | 1.489524ms | 1.804479ms |
+| DaySix | 7.069µs | 11.457µs |
+| DaySeven | 486.528µs | 4.992781ms |
+| DayEight | 718.92µs | 875.304µs |
+| DayNine | 405.226µs | 2.282801ms |
 
 
-Total: `21.518289ms`
+Total: `21.242701ms`
