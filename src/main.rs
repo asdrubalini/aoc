@@ -8,5 +8,5 @@ fn main() {
 
     println!("{}", solution);
 
-    // DayEight::assert_solutions();
+    DayEight::assert_solutions();
 }

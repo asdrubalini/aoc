@@ -82,8 +82,6 @@ impl Entry {
     /// These digits can be easily identified by just checking their length.
     fn find_easy_digits(&mut self) {
         for digit in self.observed_patterns.iter_mut() {
-            println!("{:?}", digit);
-
             match digit.signals.len() {
                 2 => {
                     digit.set_identified_digit(1);
@@ -104,8 +102,6 @@ impl Entry {
                 _ => continue,
             }
         }
-
-        println!("\n");
     }
 
     fn compute_output(&self) -> u32 {
@@ -291,6 +287,6 @@ impl Solution for DayEight {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (278, 0)
+        (278, 986179)
     }
 }
