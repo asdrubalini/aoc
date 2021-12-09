@@ -28,6 +28,9 @@ pub use day_seven::DaySeven;
 mod day_eight;
 pub use day_eight::DayEight;
 
+mod day_nine;
+pub use day_nine::DayNine;
+
 const SAMPLE_SIZE: usize = 128;
 
 pub trait Solution {
