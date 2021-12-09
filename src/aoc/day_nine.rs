@@ -36,6 +36,28 @@ impl Matrix {
         self.inner[y][x]
     }
 
+    fn get_neighbor(&self, x: usize, y: usize) -> Vec<u8> {
+        let mut neighbors = vec![];
+
+        if x > 0 {
+            neighbors.push(self.get(x - 1, y));
+        }
+
+        if x + 1 < self.width {
+            neighbors.push(self.get(x + 1, y));
+        }
+
+        if y > 0 {
+            neighbors.push(self.get(x, y - 1));
+        }
+
+        if y + 1 < self.height {
+            neighbors.push(self.get(x, y + 1));
+        }
+
+        neighbors
+    }
+
     fn neighbors(&self) -> Neighbors {
         Neighbors {
             matrix: self,
@@ -65,24 +87,7 @@ impl Iterator for Neighbors<'_> {
         }
 
         let current_cell = self.matrix.get(self.current_x, self.current_y);
-
-        let mut neighbors = vec![];
-
-        if self.current_x > 0 {
-            neighbors.push(self.matrix.get(self.current_x - 1, self.current_y));
-        }
-
-        if self.current_x + 1 < self.matrix.width {
-            neighbors.push(self.matrix.get(self.current_x + 1, self.current_y));
-        }
-
-        if self.current_y > 0 {
-            neighbors.push(self.matrix.get(self.current_x, self.current_y - 1));
-        }
-
-        if self.current_y + 1 < self.matrix.height {
-            neighbors.push(self.matrix.get(self.current_x, self.current_y + 1));
-        }
+        let neighbors = self.matrix.get_neighbor(self.current_x, self.current_y);
 
         self.current_x += 1;
         Some((current_cell, neighbors))
@@ -102,7 +107,7 @@ impl Solution for DayNine {
         matrix
             .neighbors()
             .into_iter()
-            .filter(|(point, neighbors)| neighbors.into_iter().all(|neighbor| point < neighbor))
+            .filter(|(point, neighbors)| neighbors.iter().all(|neighbor| point < neighbor))
             .map(|(point, _)| (point as u32) + 1)
             .sum()
     }
