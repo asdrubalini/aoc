@@ -207,10 +207,6 @@ impl Solution for DayTen {
                 })
                 .count();
 
-            // if mismatched_errors_count % 2 == 0 {
-            // println!("{}", entry.original_string);
-            // }
-
             println!("{} -> {:?}", entry.original_string, entry.errors);
         }
 
