@@ -67,7 +67,7 @@ impl Matrix {
     }
 
     #[inline]
-    fn get(&self, x: usize, y: usize) -> Point {
+    fn point_at(&self, x: usize, y: usize) -> Point {
         Point {
             height: self.inner[y][x],
             x,
@@ -82,22 +82,22 @@ impl Matrix {
 
         if point.x > 0 {
             let next_point = point.to_left();
-            neighbors.push(self.get(next_point.x, next_point.y));
+            neighbors.push(self.point_at(next_point.x, next_point.y));
         }
 
         if point.x + 1 < self.width {
             let next_point = point.to_right();
-            neighbors.push(self.get(next_point.x, next_point.y));
+            neighbors.push(self.point_at(next_point.x, next_point.y));
         }
 
         if point.y > 0 {
             let next_point = point.to_bottom();
-            neighbors.push(self.get(next_point.x, next_point.y));
+            neighbors.push(self.point_at(next_point.x, next_point.y));
         }
 
         if point.y + 1 < self.height {
             let next_point = point.to_top();
-            neighbors.push(self.get(next_point.x, next_point.y));
+            neighbors.push(self.point_at(next_point.x, next_point.y));
         }
 
         neighbors
@@ -105,7 +105,7 @@ impl Matrix {
 
     /// Get an iterator that finds all the neighbors
     fn neighbors(&self) -> Neighbors {
-        let start_point = self.get(0, 0);
+        let start_point = self.point_at(0, 0);
 
         Neighbors {
             matrix: self,
@@ -128,7 +128,7 @@ struct Neighbors<'a> {
 }
 
 impl Iterator for Neighbors<'_> {
-    type Item = ((u8, Point), Vec<u8>);
+    type Item = (Point, Vec<Point>);
 
     #[inline]
     fn next(&mut self) -> Option<Self::Item> {
@@ -141,12 +141,14 @@ impl Iterator for Neighbors<'_> {
             return None;
         }
 
-        let current_cell = (self.matrix.get(self.current_point), self.current_point);
+        let current_cell = self
+            .matrix
+            .point_at(self.current_point.x, self.current_point.y);
+
         let neighbors = self
             .matrix
             .get_neighbor(self.current_point)
-            .iter()
-            .map(|p| p.0)
+            .into_iter()
             .collect();
 
         self.current_point.x += 1;
@@ -173,11 +175,11 @@ impl Basin<'_> {
             let neighbors = self.matrix.get_neighbor(current_point);
             let valid_neighbors = neighbors
                 .iter()
-                .filter(|point| point.0 < 9)
-                .filter(|point| !basin_points.contains(&point.1))
+                .filter(|point| point.height < 9)
+                .filter(|point| !basin_points.contains(&point))
                 .collect::<Vec<_>>();
 
-            basins_queue.extend(valid_neighbors.iter().map(|point| point.1));
+            basins_queue.extend(valid_neighbors.into_iter());
         }
 
         // Remove duplicate points and then get the size
@@ -199,8 +201,12 @@ impl Solution for DayNine {
         matrix
             .neighbors()
             .into_iter()
-            .filter(|(point, neighbors)| neighbors.iter().all(|neighbor| point.0 < *neighbor))
-            .map(|(point, _)| (point.0 as u32) + 1)
+            .filter(|(point, neighbors)| {
+                neighbors
+                    .iter()
+                    .all(|neighbor| point.height < neighbor.height)
+            })
+            .map(|(point, _)| (point.height as u32) + 1)
             .sum()
     }
 
@@ -211,8 +217,12 @@ impl Solution for DayNine {
         let min_points = matrix
             .neighbors()
             .into_iter()
-            .filter(|(point, neighbors)| neighbors.iter().all(|neighbor| point.0 < *neighbor))
-            .map(|(point, _)| (point.1));
+            .filter(|(point, neighbors)| {
+                neighbors
+                    .iter()
+                    .all(|neighbor| point.height < neighbor.height)
+            })
+            .map(|(point, _)| (point));
 
         // For each low point, find a basin, compute its size and then multiply them together
         min_points
