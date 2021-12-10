@@ -3,8 +3,8 @@
 use advent_of_code_2021::aoc::*;
 
 fn main() {
-    let input = DayNine::input();
-    let solution = DayNine::solve_second(input);
+    let input = DayTen::input();
+    let solution = DayTen::solve_first(input);
 
     println!("{}", solution);
 
