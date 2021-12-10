@@ -32,25 +32,28 @@ impl ChunksEntry {
         }
     }
 
-    fn parse_tokens(tokens: &[Token], mut starts_at: usize) -> (usize, Option<ChunkNode>) {
-        if starts_at + 1 > tokens.len() {
-            return (starts_at, None);
+    fn parse_tokens(tokens: &[Token], start_pos: usize) -> (usize, Option<ChunkNode>) {
+        println!("{}", start_pos);
+
+        if start_pos + 1 > tokens.len() {
+            return (start_pos, None);
         }
 
-        let start_token = tokens[starts_at];
+        let start_token = tokens[start_pos];
 
         if start_token.is_close() {
-            return (starts_at, None);
+            return (start_pos, None);
         }
 
+        let mut current_pos = start_pos;
         let mut current_node = ChunkNode {
             kind: start_token.kind(),
             inside: vec![],
         };
 
         loop {
-            let (position, node) = Self::parse_tokens(tokens, starts_at + 1);
-            starts_at = position;
+            let (next_pos, node) = Self::parse_tokens(tokens, current_pos + 1);
+            current_pos = next_pos;
 
             match node {
                 Some(node) => current_node.inside.push(node),
@@ -58,7 +61,7 @@ impl ChunksEntry {
             }
         }
 
-        (starts_at, Some(current_node))
+        (current_pos, Some(current_node))
     }
 }
 
