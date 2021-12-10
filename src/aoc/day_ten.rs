@@ -1,6 +1,6 @@
 use super::Solution;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 enum BracketKind {
     Round,
     Square,
@@ -17,25 +17,29 @@ struct ChunkNode {
 #[derive(Debug)]
 struct ChunksEntry {
     brackets: Vec<ChunkNode>,
-    error_score: u32,
+    errors: Vec<ErrorKind>,
+    original_string: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 enum ErrorKind {
     CloseBracketNotFound,
-    MismatchedCloseBracket,
+    IncorrectCloseBracket(BracketKind),
 }
 
 impl ChunksEntry {
-    fn from_str(input: &str) -> Result<Self, ErrorKind> {
+    fn from_str(input: &str) -> Self {
         let tokens = Token::lex(input);
 
         let mut current_pos = 0;
         let mut nodes = vec![];
+        let mut errors = vec![];
 
         loop {
-            let (next_pos, node) = Self::parse_tokens(&tokens, current_pos + 1)?;
+            let (next_pos, node, next_errors) =
+                Self::parse_tokens(&tokens, current_pos + 1, vec![]);
             current_pos = next_pos;
+            errors.extend(next_errors.into_iter());
 
             match node {
                 Some(node) => nodes.push(node),
@@ -43,39 +47,51 @@ impl ChunksEntry {
             }
         }
 
-        Ok(Self {
+        Self {
             brackets: nodes,
-            error_score: 0,
-        })
+            errors,
+            original_string: input.to_string(),
+        }
     }
 
     fn parse_tokens(
         tokens: &[Token],
         start_pos: usize,
-    ) -> Result<(usize, Option<ChunkNode>), ErrorKind> {
+        mut errors: Vec<ErrorKind>,
+    ) -> (usize, Option<ChunkNode>, Vec<ErrorKind>) {
         if start_pos + 1 > tokens.len() {
-            return Ok((start_pos, None));
+            return (start_pos, None, errors);
         }
 
         let start_token = tokens[start_pos];
 
         if start_token.is_close() {
-            return Ok((start_pos, None));
+            return (start_pos, None, errors);
         }
 
-        let close_token = start_token.to_close();
-        let close_tokens = tokens
+        let expected_close_token = start_token.to_close();
+        let next_close_tokens = tokens
             .iter()
             .skip(start_pos)
             .filter(|token| token.is_close())
-            .filter(|token| **token == close_token)
             .collect::<Vec<_>>();
 
-        if close_tokens.len() == 0 {
-            return Err(ErrorKind::CloseBracketNotFound);
-        } else if close_tokens.len() % 2 == 0 {
-            return Err(ErrorKind::MismatchedCloseBracket);
+        let next_close_token = next_close_tokens.get(0);
+
+        if next_close_token.is_none() {
+            errors.push(ErrorKind::CloseBracketNotFound);
+        } else {
+            let next_close_token = **next_close_token.unwrap();
+            if next_close_token != expected_close_token {
+                errors.push(ErrorKind::IncorrectCloseBracket(next_close_token.kind()));
+            }
         }
+
+        // if close_tokens.len() == 0 {
+        // errors.push(ErrorKind::CloseBracketNotFound);
+        // } else if close_tokens.len() % 2 == 0 {
+        // errors.push(ErrorKind::MismatchedCloseBracket);
+        // }
 
         let mut current_pos = start_pos;
         let mut current_node = ChunkNode {
@@ -84,8 +100,9 @@ impl ChunksEntry {
         };
 
         loop {
-            let (next_pos, node) = Self::parse_tokens(tokens, current_pos + 1)?;
+            let (next_pos, node, next_errors) = Self::parse_tokens(tokens, current_pos + 1, errors);
             current_pos = next_pos;
+            errors = next_errors;
 
             match node {
                 Some(node) => current_node.inside.push(node),
@@ -93,7 +110,7 @@ impl ChunksEntry {
             }
         }
 
-        Ok((current_pos, Some(current_node)))
+        (current_pos, Some(current_node), errors)
     }
 }
 
@@ -161,7 +178,7 @@ impl Token {
 pub struct DayTen;
 
 impl DayTen {
-    fn parse_input(input: &str) -> Vec<Result<ChunksEntry, ErrorKind>> {
+    fn parse_input(input: &str) -> Vec<ChunksEntry> {
         input
             .lines()
             .filter(|line| !line.is_empty())
@@ -181,12 +198,20 @@ impl Solution for DayTen {
         let input = Self::parse_input(input);
 
         for entry in input {
-            match entry {
-                Ok(entry) => println!(" ok"),
-                Err(error) => {
-                    println!(" {:?}", error);
-                }
-            }
+            let mismatched_errors_count = entry
+                .errors
+                .iter()
+                .filter(|error| match **error {
+                    ErrorKind::IncorrectCloseBracket(_) => true,
+                    _ => false,
+                })
+                .count();
+
+            // if mismatched_errors_count % 2 == 0 {
+            // println!("{}", entry.original_string);
+            // }
+
+            println!("{} -> {:?}", entry.original_string, entry.errors);
         }
 
         0
