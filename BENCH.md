@@ -1,7 +1,7 @@
 # Benchmarks:
 | Day | First part | Second part |
 | --- | --- | --- |
-| DayOne | 43.906µs | 42.644µs |
+| DayOne | 16.57µs | 14.818µs |
 
 
-Total: `86.55µs`
+Total: `31.388µs`

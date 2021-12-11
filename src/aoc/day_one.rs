@@ -1,5 +1,3 @@
-use itertools::Itertools;
-
 use super::Solution;
 
 pub struct DayOne;
