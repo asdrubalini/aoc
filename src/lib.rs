@@ -20,12 +20,4 @@ mod tests {
     use paste::paste;
 
     test_day!(DayOne);
-    test_day!(DayTwo);
-    test_day!(DayThree);
-    test_day!(DayFour);
-    test_day!(DayFive);
-    test_day!(DaySix);
-    test_day!(DaySeven);
-    test_day!(DayEight);
-    test_day!(DayNine);
 }

@@ -7,33 +7,6 @@ use std::{
 mod day_one;
 pub use day_one::DayOne;
 
-mod day_two;
-pub use day_two::DayTwo;
-
-mod day_three;
-pub use day_three::DayThree;
-
-mod day_four;
-pub use day_four::DayFour;
-
-mod day_five;
-pub use day_five::DayFive;
-
-mod day_six;
-pub use day_six::DaySix;
-
-mod day_seven;
-pub use day_seven::DaySeven;
-
-mod day_eight;
-pub use day_eight::DayEight;
-
-mod day_nine;
-pub use day_nine::DayNine;
-
-mod day_ten;
-pub use day_ten::DayTen;
-
 const SAMPLE_SIZE: usize = 128;
 
 pub trait Solution {
