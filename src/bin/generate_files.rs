@@ -1,10 +1,9 @@
-use std::{env::current_dir, fmt::format, fs::File, io::Write};
+use std::{env::current_dir, fs::File, io::Write};
 
 use convert_case::Casing;
 
 fn main() {
-    let s = "
-use crate::aoc::Solution;
+    let s = "use crate::aoc::Solution;
 
 pub struct DAY_NAME;
 
@@ -15,19 +14,18 @@ impl Solution for DAY_NAME {
         \"\"
     }
 
-    fn solve_first(input: &str) -> Self::Output {
+    fn solve_first(_input: &str) -> Self::Output {
         0
     }
 
-    fn solve_second(input: &str) -> Self::Output {
+    fn solve_second(_input: &str) -> Self::Output {
         0
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
         (0, 0)
     }
-}
-    ";
+}";
 
     let days = vec![
         "One",
@@ -70,16 +68,16 @@ impl Solution for DAY_NAME {
             "mod {snake_name};\npub use {snake_name}::{day};\n"
         ));
 
-        // let mut f = File::create(path).unwrap();
-        // f.write_all(content.as_bytes()).unwrap();
+        let mut f = File::create(path).unwrap();
+        f.write_all(content.as_bytes()).unwrap();
 
         // println!("{day}::benchmark()+")
-        println!("test_day!({day});");
+        // println!("test_day!({day});");
     }
 
     let mut path = current_dir().unwrap();
     path.push("src/aoc/days/mod.rs");
 
-    // let mut f = File::create(path).unwrap();
-    // f.write_all(mod_content.as_bytes()).unwrap();
+    let mut f = File::create(path).unwrap();
+    f.write_all(mod_content.as_bytes()).unwrap();
 }

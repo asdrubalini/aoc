@@ -1,4 +1,3 @@
-
 use crate::aoc::Solution;
 
 pub struct Eleven;
@@ -10,11 +9,11 @@ impl Solution for Eleven {
         ""
     }
 
-    fn solve_first(input: &str) -> Self::Output {
+    fn solve_first(_input: &str) -> Self::Output {
         0
     }
 
-    fn solve_second(input: &str) -> Self::Output {
+    fn solve_second(_input: &str) -> Self::Output {
         0
     }
 
@@ -22,4 +21,3 @@ impl Solution for Eleven {
         (0, 0)
     }
 }
-    
