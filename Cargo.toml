@@ -7,3 +7,4 @@ default-run = "advent-of-code-2021"
 [dependencies]
 itertools = "0.10"
 paste = "1.0"
+convert_case = "0.6"

@@ -16,16 +16,33 @@ macro_rules! test_day {
 
 #[cfg(test)]
 mod tests {
-    use super::aoc::*;
+    use super::aoc::days::*;
+    use super::aoc::Solution;
     use paste::paste;
 
-    test_day!(DayOne);
-    test_day!(DayTwo);
-    test_day!(DayThree);
-    test_day!(DayFour);
-    test_day!(DayFive);
-    test_day!(DaySix);
-    test_day!(DaySeven);
-    test_day!(DayEight);
-    test_day!(DayNine);
+    test_day!(One);
+    test_day!(Two);
+    test_day!(Three);
+    test_day!(Four);
+    test_day!(Five);
+    test_day!(Six);
+    test_day!(Seven);
+    test_day!(Eight);
+    test_day!(Nine);
+    test_day!(Ten);
+    test_day!(Eleven);
+    test_day!(Twelve);
+    test_day!(Thirteen);
+    test_day!(Fourteen);
+    test_day!(Fifteen);
+    test_day!(Sixteen);
+    test_day!(Seventeen);
+    test_day!(Eighteen);
+    test_day!(Nineteen);
+    test_day!(Twenty);
+    test_day!(TwentyOne);
+    test_day!(TwentyTwo);
+    test_day!(TwentyThree);
+    test_day!(TwentyFour);
+    test_day!(TwentyFive);
 }
