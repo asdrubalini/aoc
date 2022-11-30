@@ -4,8 +4,8 @@ fn main() {
     use std::time::Duration;
 
     println!("# Advent of Code 2022");
-    println!("Run tests: `cargo test`");
-    println!("Generate benchmarks: `cargo run --bin bench`");
+    println!("Run tests: `cargo test`\n");
+    println!("Generate benchmarks: `cargo run --bin bench`\n");
 
     println!("# Benchmarks:");
 
