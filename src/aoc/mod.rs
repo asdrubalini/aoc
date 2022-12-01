@@ -16,7 +16,7 @@ pub trait Solution {
     fn input() -> &'static str;
 
     /// Parse input and provide a custom version of type Self::Parsed
-    fn parse_input(input: &'static str) -> Self::Parsed;
+    fn parse_input(_input: &'static str) -> Self::Parsed;
 
     /// Solve first problem an provide an output
     fn solve_first(input: &Self::Parsed) -> Self::Output;

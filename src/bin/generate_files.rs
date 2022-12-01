@@ -15,15 +15,15 @@ impl Solution for DAY_NAME {
         \"\"
     }
 
-    fn parse_input(input: &'static str) -> Self::Parsed {
+    fn parse_input(_input: &'static str) -> Self::Parsed {
         vec![]
     }
 
-    fn solve_first(_input: &str) -> Self::Output {
+    fn solve_first(_parsed: &Self::Parsed) -> Self::Output {
         0
     }
 
-    fn solve_second(_input: &str) -> Self::Output {
+    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
         0
     }
 
@@ -33,7 +33,7 @@ impl Solution for DAY_NAME {
 }";
 
     let days = vec![
-        "One",
+        // "One",
         "Two",
         "Three",
         "Four",
