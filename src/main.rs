@@ -6,7 +6,8 @@ mod aoc;
 
 fn main() {
     let input = One::input();
-    let solution = One::solve_first(input);
+    let parsed = One::parse_input(input);
+    let solution = One::solve_second(&parsed);
 
     println!("{}", solution);
 }

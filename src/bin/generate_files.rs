@@ -9,9 +9,14 @@ pub struct DAY_NAME;
 
 impl Solution for DAY_NAME {
     type Output = usize;
+    type Parsed = Vec<u32>;
 
     fn input() -> &'static str {
         \"\"
+    }
+
+    fn parse_input(input: &'static str) -> Self::Parsed {
+        vec![]
     }
 
     fn solve_first(_input: &str) -> Self::Output {

@@ -6,7 +6,7 @@ Generate benchmarks: `cargo run --bin bench`
 # Benchmarks:
 | Day | First part | Second part |
 | --- | --- | --- |
-| One | 8ns | 6ns |
+| One | 95.868µs | 93.463µs |
 
 
-Total: `14ns`
+Total: `189.331µs`

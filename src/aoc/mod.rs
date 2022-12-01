@@ -6,38 +6,53 @@ use std::{
 
 pub mod days;
 
-const SAMPLE_SIZE: usize = 128;
+const SAMPLE_SIZE: usize = 8192;
 
 pub trait Solution {
     type Output: Eq + Debug;
+    type Parsed;
 
+    /// Provide input for the problem
     fn input() -> &'static str;
-    fn solve_first(input: &str) -> Self::Output;
-    fn solve_second(input: &str) -> Self::Output;
+
+    /// Parse input and provide a custom version of type Self::Parsed
+    fn parse_input(input: &'static str) -> Self::Parsed;
+
+    /// Solve first problem an provide an output
+    fn solve_first(input: &Self::Parsed) -> Self::Output;
+
+    /// Solve second problem and provide an output
+    fn solve_second(input: &Self::Parsed) -> Self::Output;
+
+    /// Provide expected solutions for the day in order to make sure that tests are ok
     fn expected_solutions() -> (Self::Output, Self::Output);
 
+    /// panic! if solutions are wrong
     fn assert_solutions() {
         let input = Self::input();
+        let parsed = Self::parse_input(input);
 
-        let first = Self::solve_first(input);
-        let second = Self::solve_second(input);
+        let first = Self::solve_first(&parsed);
+        let second = Self::solve_second(&parsed);
 
         assert_eq!(first, Self::expected_solutions().0);
         assert_eq!(second, Self::expected_solutions().1);
     }
 
+    /// Measure how many nanoseconds solutions take to run
     fn benchmark() -> u64 {
         let type_name = type_name::<Self>().split("::").last().unwrap();
 
         print!("| {} ", type_name);
 
         let input = Self::input();
+        let parsed = Self::parse_input(input);
 
         let elapsed: f64 = (0..SAMPLE_SIZE)
             .into_iter()
             .map(|_| {
                 let begin = Instant::now();
-                let _ = Self::solve_first(input);
+                let _ = Self::solve_first(&parsed);
                 begin.elapsed().as_nanos()
             })
             .sum::<u128>() as f64
@@ -50,7 +65,7 @@ pub trait Solution {
             .into_iter()
             .map(|_| {
                 let begin = Instant::now();
-                let _ = Self::solve_second(input);
+                let _ = Self::solve_second(&parsed);
                 begin.elapsed().as_nanos()
             })
             .sum::<u128>() as f64
