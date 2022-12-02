@@ -1,5 +1,7 @@
 #![allow(dead_code, unused_macros, unused_variables)]
 
+extern crate core;
+
 pub mod aoc;
 
 /// Generate tests for day n

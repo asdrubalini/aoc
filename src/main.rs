@@ -1,13 +1,13 @@
 #![allow(dead_code, unused_imports)]
 
-use advent_of_code_2021::aoc::{days::One, Solution};
+use advent_of_code_2021::aoc::{days::Two, Solution};
 
 mod aoc;
 
 fn main() {
-    let input = One::input();
-    let parsed = One::parse_input(input);
-    let solution = One::solve_second(&parsed);
+    let input = Two::input();
+    let parsed = Two::parse_input(input);
+    let solution = Two::solve_first(&parsed);
 
-    println!("{}", solution);
+    println!("{:?}", solution);
 }
