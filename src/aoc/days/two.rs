@@ -3,7 +3,7 @@ use itertools::Itertools;
 
 pub struct Two;
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub enum Move {
     Rock,
     Paper,
@@ -29,7 +29,7 @@ impl Move {
             (Move::Paper, Move::Paper) => 3,
             (Move::Scissor, Move::Scissor) => 3,
 
-            // lost
+            // lose
             (Move::Rock, Move::Paper) => 0,
             (Move::Paper, Move::Scissor) => 0,
             (Move::Scissor, Move::Rock) => 0,
@@ -47,6 +47,23 @@ impl Move {
         };
 
         score_match + score_object
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+enum RoundConclusion {
+    Win,
+    Lose,
+    Draw,
+}
+
+impl From<Move> for RoundConclusion {
+    fn from(from: Move) -> Self {
+        match from {
+            Move::Rock => Self::Lose,
+            Move::Paper => Self::Draw,
+            Move::Scissor => Self::Win,
+        }
     }
 }
 
@@ -71,12 +88,33 @@ impl Solution for Two {
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
         parsed
             .iter()
-            .map(|(move_opponent, move_me)| move_me.score_against(move_opponent))
+            .map(|(opponent_move, my_move)| my_move.score_against(opponent_move))
             .sum::<u32>()
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        parsed
+            .iter()
+            .map(|(move_opponent, round_end)| {
+                let round_end = RoundConclusion::from(*round_end);
+
+                let my_move: Move = match (round_end, move_opponent) {
+                    (RoundConclusion::Win, Move::Rock) => Move::Paper,
+                    (RoundConclusion::Win, Move::Paper) => Move::Scissor,
+                    (RoundConclusion::Win, Move::Scissor) => Move::Rock,
+
+                    (RoundConclusion::Lose, Move::Rock) => Move::Scissor,
+                    (RoundConclusion::Lose, Move::Paper) => Move::Rock,
+                    (RoundConclusion::Lose, Move::Scissor) => Move::Paper,
+
+                    (RoundConclusion::Draw, Move::Rock) => Move::Rock,
+                    (RoundConclusion::Draw, Move::Paper) => Move::Paper,
+                    (RoundConclusion::Draw, Move::Scissor) => Move::Scissor,
+                };
+
+                my_move.score_against(move_opponent)
+            })
+            .sum::<u32>()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {

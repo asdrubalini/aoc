@@ -10,7 +10,7 @@ const SAMPLE_SIZE: usize = 8192;
 
 pub trait Solution {
     type Output: Eq + Debug;
-    type Parsed;
+    type Parsed: Debug;
 
     /// Provide input for the problem
     fn input() -> &'static str;

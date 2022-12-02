@@ -7,7 +7,7 @@ mod aoc;
 fn main() {
     let input = Two::input();
     let parsed = Two::parse_input(input);
-    let solution = Two::solve_first(&parsed);
+    let solution = Two::solve_second(&parsed);
 
     println!("{:?}", solution);
 }
