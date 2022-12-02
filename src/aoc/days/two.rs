@@ -118,6 +118,6 @@ impl Solution for Two {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (13446, 0)
+        (13446, 13509)
     }
 }
