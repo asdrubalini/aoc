@@ -25,15 +25,17 @@ impl From<&str> for Rucksack {
 
 impl Rucksack {
     fn find_duplicates(&self) -> Vec<char> {
-        let mut duplicates = vec![];
-
-        for item in self.left.iter() {
-            if self.right.contains(item) && !duplicates.contains(item) {
-                duplicates.push(*item);
-            }
-        }
-
-        duplicates
+        self.left
+            .iter()
+            .filter_map(|item| {
+                if self.right.contains(item) {
+                    Some(*item)
+                } else {
+                    None
+                }
+            })
+            .unique()
+            .collect()
     }
 
     fn compute_priority(item: char) -> u32 {
