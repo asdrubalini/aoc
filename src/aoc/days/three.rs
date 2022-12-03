@@ -79,7 +79,7 @@ impl Solution for Three {
                 // find duplicate badges and sum the priorities
                 duplicates
                     .into_iter()
-                    .map(|dup| Rucksack::compute_priority(dup))
+                    .map(Rucksack::compute_priority)
                     .sum::<u32>()
             })
             .sum::<u32>()
@@ -104,7 +104,7 @@ impl Solution for Three {
                 let badge: Vec<char> = badge_counter
                     .iter()
                     .filter_map(|(key, value)| if *value == 3 { Some(key) } else { None })
-                    .map(|c| *c)
+                    .copied()
                     .collect();
 
                 assert_eq!(badge.len(), 1);
