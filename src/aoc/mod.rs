@@ -6,7 +6,7 @@ use std::{
 
 pub mod days;
 
-const SAMPLE_SIZE: usize = 8192;
+const SAMPLE_SIZE: usize = 1024;
 
 pub trait Solution {
     type Output: Eq + Debug;

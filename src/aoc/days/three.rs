@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use itertools::Itertools;
 
 use crate::aoc::Solution;
@@ -34,7 +36,7 @@ impl Rucksack {
         duplicates
     }
 
-    fn compute_priority(&self, item: char) -> u32 {
+    fn compute_priority(item: char) -> u32 {
         if ('A'..='Z').contains(&item) {
             (item as u8 - 38) as u32
         } else if ('a'..='z').contains(&item) {
@@ -42,6 +44,15 @@ impl Rucksack {
         } else {
             panic!("wtf")
         }
+    }
+
+    fn unique_badges(&self) -> Vec<char> {
+        self.left
+            .iter()
+            .merge(self.right.iter())
+            .unique()
+            .map(|c| c.to_owned())
+            .collect()
     }
 }
 
@@ -65,17 +76,49 @@ impl Solution for Three {
 
                 duplicates
                     .into_iter()
-                    .map(|dup| rucksack.compute_priority(dup))
+                    .map(|dup| Rucksack::compute_priority(dup))
                     .sum::<u32>()
             })
             .sum::<u32>()
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        7824
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let group_badges: Vec<char> = parsed
+            .iter()
+            .chunks(3)
+            .into_iter()
+            .map(|rucksucks| {
+                let mut badge_counter: HashMap<char, u8> = HashMap::new();
+
+                // count how many times each badge appears
+                for sack in rucksucks.map(|r| r.unique_badges()) {
+                    for badge in sack {
+                        *badge_counter.entry(badge).or_default() += 1;
+                    }
+                }
+
+                println!("{:?}", badge_counter);
+
+                // there should be just one badge with counter of three
+                let badge: Vec<char> = badge_counter
+                    .iter()
+                    .filter_map(|(key, value)| if *value == 3 { Some(key) } else { None })
+                    .map(|c| *c)
+                    .collect();
+
+                assert_eq!(badge.len(), 1);
+
+                badge.first().unwrap().to_owned()
+            })
+            .collect();
+
+        group_badges
+            .iter()
+            .map(|c| Rucksack::compute_priority(*c))
+            .sum::<u32>()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (7824, 2798)
     }
 }
