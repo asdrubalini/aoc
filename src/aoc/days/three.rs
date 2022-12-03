@@ -34,11 +34,11 @@ impl Rucksack {
         duplicates
     }
 
-    fn compute_priority(&self, duplicate: char) -> u32 {
-        if ('A'..='Z').contains(&duplicate) {
-            (duplicate as u8 - 38) as u32
-        } else if ('a'..='z').contains(&duplicate) {
-            (duplicate as u8 - 96) as u32
+    fn compute_priority(&self, item: char) -> u32 {
+        if ('A'..='Z').contains(&item) {
+            (item as u8 - 38) as u32
+        } else if ('a'..='z').contains(&item) {
+            (item as u8 - 96) as u32
         } else {
             panic!("wtf")
         }
