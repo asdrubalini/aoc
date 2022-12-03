@@ -74,6 +74,7 @@ impl Solution for Three {
             .map(|rucksack| {
                 let duplicates = rucksack.find_duplicates();
 
+                // find duplicate badges and sum the priorities
                 duplicates
                     .into_iter()
                     .map(|dup| Rucksack::compute_priority(dup))
@@ -96,8 +97,6 @@ impl Solution for Three {
                         *badge_counter.entry(badge).or_default() += 1;
                     }
                 }
-
-                println!("{:?}", badge_counter);
 
                 // there should be just one badge with counter of three
                 let badge: Vec<char> = badge_counter
