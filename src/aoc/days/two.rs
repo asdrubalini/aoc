@@ -22,8 +22,8 @@ impl From<&str> for Move {
 }
 
 impl Move {
-    fn score_against(&self, move_opponent: &Self) -> u32 {
-        let score_match = match (self, move_opponent) {
+    fn score_against(&self, opponent_move: &Self) -> u32 {
+        let score_match = match (self, opponent_move) {
             // draw
             (Move::Rock, Move::Rock) => 3,
             (Move::Paper, Move::Paper) => 3,
