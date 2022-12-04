@@ -64,14 +64,7 @@ impl Solution for Four {
                 } else if second.len() > first.len() {
                     second.fully_include_other(first) as u32
                 } else {
-                    let x = first.fully_include_other(second) as u32;
-                    let y = second.fully_include_other(first) as u32;
-
-                    if x + y == 2 {
-                        1
-                    } else {
-                        x + y
-                    }
+                    (first.fully_include_other(second) || second.fully_include_other(first)) as u32
                 }
             })
             .sum::<u32>()
@@ -82,6 +75,6 @@ impl Solution for Four {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (498, 0)
     }
 }
