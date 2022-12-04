@@ -11,10 +11,12 @@ pub struct SectionRange {
 }
 
 impl SectionRange {
+    /// range len
     fn len(&self) -> u32 {
         self.stop.abs_diff(self.start)
     }
 
+    /// if self fully includes other range
     fn fully_include_other(&self, other: &Self) -> bool {
         for i in other.start..=other.stop {
             if i < self.start || i > self.stop {
@@ -22,7 +24,7 @@ impl SectionRange {
             }
         }
 
-        return true;
+        true
     }
 }
 
@@ -58,16 +60,15 @@ impl Solution for Four {
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
         parsed
             .iter()
-            .map(|(first, second)| {
-                if first.len() > second.len() {
-                    first.fully_include_other(second) as u32
-                } else if second.len() > first.len() {
-                    second.fully_include_other(first) as u32
-                } else {
-                    (first.fully_include_other(second) || second.fully_include_other(first)) as u32
+            .map(|(first, second)| match first.len().cmp(&second.len()) {
+                std::cmp::Ordering::Less => second.fully_include_other(first),
+                std::cmp::Ordering::Equal => {
+                    first.fully_include_other(second) || second.fully_include_other(first)
                 }
+                std::cmp::Ordering::Greater => first.fully_include_other(second),
             })
-            .sum::<u32>()
+            .filter(|b| *b)
+            .count() as u32
     }
 
     fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
