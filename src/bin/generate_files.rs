@@ -8,7 +8,7 @@ fn main() {
 pub struct DAY_NAME;
 
 impl Solution for DAY_NAME {
-    type Output = usize;
+    type Output = u32;
     type Parsed = Vec<u32>;
 
     fn input() -> &'static str {

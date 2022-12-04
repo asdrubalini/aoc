@@ -12,9 +12,9 @@ macro_rules! bench_day {
 
 fn criterion_benchmark(c: &mut Criterion) {
     bench_day!(c, One);
-    //bench_day!(c, Two);
-    //bench_day!(c, Three);
-    // bench_day!(c, Four);
+    bench_day!(c, Two);
+    bench_day!(c, Three);
+    bench_day!(c, Four);
     // bench_day!(c, Five);
     // bench_day!(c, Six);
     // bench_day!(c, Seven);

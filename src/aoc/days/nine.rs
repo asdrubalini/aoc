@@ -3,7 +3,7 @@ use crate::aoc::Solution;
 pub struct Nine;
 
 impl Solution for Nine {
-    type Output = usize;
+    type Output = u32;
     type Parsed = Vec<u32>;
 
     fn input() -> &'static str {
