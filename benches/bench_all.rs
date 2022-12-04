@@ -7,15 +7,15 @@ macro_rules! bench_day {
         let input = $struct_name::input();
         let parsed = $struct_name::parse_input(input);
 
-        $c.bench_function(stringify!(Day / $struct_name / Parse), |b| {
+        $c.bench_function(stringify!($struct_name / Parse), |b| {
             b.iter(|| $struct_name::parse_input(input))
         });
 
-        $c.bench_function(stringify!(Day / $struct_name / First), |b| {
+        $c.bench_function(stringify!($struct_name / Part I), |b| {
             b.iter(|| $struct_name::solve_first(&parsed))
         });
 
-        $c.bench_function(stringify!(Day / $struct_name / Second), |b| {
+        $c.bench_function(stringify!($struct_name / Part II), |b| {
             b.iter(|| $struct_name::solve_second(&parsed))
         });
     };
@@ -24,8 +24,8 @@ macro_rules! bench_day {
 fn criterion_benchmark(c: &mut Criterion) {
     bench_day!(c, One);
     bench_day!(c, Two);
-    bench_day!(c, Three);
-    bench_day!(c, Four);
+    // bench_day!(c, Three);
+    // bench_day!(c, Four);
     //bench_day!(c, Five);
     //bench_day!(c, Six);
     //bench_day!(c, Seven);
