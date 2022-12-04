@@ -4,7 +4,7 @@ name: Benchmark
 jobs:
   build_and_test:
     name: Advent of Code
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
 
