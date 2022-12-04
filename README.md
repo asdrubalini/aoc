@@ -1,7 +1,7 @@
 # Advent of Code 2022
 Run tests: `cargo test`
 
-Generate benchmarks: `cargo criterion --message-format=json | criterion-table >> README.md`
+Generate benchmarks: `cargo criterion --message-format=json | criterion-table >> BENCHMARKS.md`
 
 <!--- advent_readme_stars table --->
 ## 2022 Results

@@ -17,27 +17,17 @@ impl SectionRange {
     }
 
     /// if self fully includes other range
+    /// self <---------------------->
+    /// other       <----------->
     fn fully_include_other(&self, other: &Self) -> bool {
-        for i in other.start..=other.stop {
-            if i < self.start || i > self.stop {
-                return false;
-            }
-        }
-
-        true
+        self.start <= other.start && self.stop >= other.stop
     }
 
-    /// if the two ranges overlapping at least once
-    fn overlap_with_other(&self, other: &Self) -> bool {
-        for i in self.start..=self.stop {
-            for j in other.start..=other.stop {
-                if i == j {
-                    return true;
-                }
-            }
-        }
-
-        false
+    /// if the two ranges overlap at least once
+    /// self <----------------->
+    /// other           <---------------->
+    fn overlaps_with(&self, other: &Self) -> bool {
+        self.stop >= other.start && other.stop >= self.start
     }
 }
 
@@ -87,7 +77,7 @@ impl Solution for Four {
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
         parsed
             .iter()
-            .map(|(first, second)| first.overlap_with_other(second))
+            .map(|(first, second)| first.overlaps_with(second))
             .filter(|b| *b)
             .count() as u32
     }
