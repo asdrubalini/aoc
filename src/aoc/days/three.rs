@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use itertools::Itertools;
 
@@ -8,8 +8,8 @@ pub struct Three;
 
 #[derive(Debug, Clone)]
 pub struct Rucksack {
-    left: Vec<char>,
-    right: Vec<char>,
+    left: HashSet<char>,
+    right: HashSet<char>,
 }
 
 impl From<&str> for Rucksack {
@@ -17,13 +17,14 @@ impl From<&str> for Rucksack {
         let (left, right) = input.split_at(input.len() / 2);
 
         Self {
-            left: left.chars().collect_vec(),
-            right: right.chars().collect_vec(),
+            left: HashSet::from_iter(left.chars()),
+            right: HashSet::from_iter(right.chars()),
         }
     }
 }
 
 impl Rucksack {
+    /// find badges contained in both left and right
     fn find_duplicates(&self) -> Vec<char> {
         self.left
             .iter()
@@ -39,12 +40,10 @@ impl Rucksack {
     }
 
     fn compute_priority(item: char) -> u32 {
-        if ('A'..='Z').contains(&item) {
-            (item as u8 - 38) as u32
-        } else if ('a'..='z').contains(&item) {
-            (item as u8 - 96) as u32
-        } else {
-            panic!("wtf")
+        match item {
+            'A'..='Z' => (item as u8 - 38) as u32, // 1 to 26
+            'a'..='z' => (item as u8 - 96) as u32, // 26 to 52
+            _ => panic!("wtf"),
         }
     }
 
@@ -53,7 +52,7 @@ impl Rucksack {
             .iter()
             .merge(self.right.iter())
             .unique()
-            .map(|c| c.to_owned())
+            .copied()
             .collect()
     }
 }
