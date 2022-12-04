@@ -26,6 +26,19 @@ impl SectionRange {
 
         true
     }
+
+    /// if the two ranges overlapping at least once
+    fn overlap_with_other(&self, other: &Self) -> bool {
+        for i in self.start..=self.stop {
+            for j in other.start..=other.stop {
+                if i == j {
+                    return true;
+                }
+            }
+        }
+
+        false
+    }
 }
 
 impl From<&str> for SectionRange {
@@ -71,11 +84,15 @@ impl Solution for Four {
             .count() as u32
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        parsed
+            .iter()
+            .map(|(first, second)| first.overlap_with_other(second))
+            .filter(|b| *b)
+            .count() as u32
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (498, 0)
+        (498, 859)
     }
 }
