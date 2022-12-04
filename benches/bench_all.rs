@@ -7,7 +7,7 @@ macro_rules! bench_day {
         let input = $struct_name::input();
         let parsed = $struct_name::parse_input(input);
 
-        $c.bench_function(stringify!($struct_name / Parse), |b| {
+        $c.bench_function(stringify!($struct_name / Input Parse), |b| {
             b.iter(|| $struct_name::parse_input(input))
         });
 
