@@ -1,0 +1,30 @@
+on: [push]
+name: Benchmark
+
+jobs:
+  build_and_test:
+    name: Advent of Code
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: cargo-criterion
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: criterion-table
+
+      - name: Start benchmarks
+        run: cargo criterion --message-format=json | criterion-table > BENCHMARKS.md
+
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Update benchmarks
