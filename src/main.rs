@@ -1,6 +1,4 @@
-#![allow(dead_code, unused_imports)]
-
-use aoc::{days::Three, Solution};
+use aoc::{days::One, Solution};
 
 mod aoc;
 
@@ -18,5 +16,5 @@ macro_rules! debug_day {
 }
 
 fn main() {
-    debug_day!(Three);
+    debug_day!(One);
 }
