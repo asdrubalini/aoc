@@ -1,4 +1,4 @@
-use aoc::{days::Four, Solution};
+use aoc::{days::*, Solution};
 
 mod aoc;
 
@@ -7,7 +7,7 @@ macro_rules! debug_day {
         let input = $struct_name::input();
 
         let parsed = $struct_name::parse_input(input);
-        println!("Parsed: {:?}", parsed);
+        println!("Parsed: {:#?}", parsed);
 
         let solution_one = $struct_name::solve_first(&parsed);
         let solution_two = $struct_name::solve_second(&parsed);
@@ -17,5 +17,5 @@ macro_rules! debug_day {
 }
 
 fn main() {
-    debug_day!(Four);
+    debug_day!(Five);
 }

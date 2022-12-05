@@ -3,7 +3,7 @@ use std::fmt::Debug;
 pub mod days;
 
 pub trait Solution {
-    type Output: Eq + Debug + Copy;
+    type Output: Eq + Debug;
     type Parsed: Debug;
 
     /// Provide input for the problem
