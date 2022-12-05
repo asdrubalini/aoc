@@ -6,6 +6,7 @@ use crate::aoc::Solution;
 
 pub struct Five;
 
+/// just a fancy way to write a char
 #[derive(Debug, Clone, Copy)]
 struct Crate(char);
 
@@ -52,12 +53,25 @@ impl From<&str> for Stacks {
 }
 
 impl Stacks {
-    fn execute_command(&mut self, command: Command) {
+    fn cratemover_9000_simulate(&mut self, command: Command) {
         for _ in 0..command.quantity {
             let stack_from = self.stacks.get_mut(command.from).unwrap();
             let moved_crate = stack_from.pop_front().unwrap();
 
             let stack_to = self.stacks.get_mut(command.to).unwrap();
+            stack_to.push_front(moved_crate);
+        }
+    }
+
+    fn cratemover_9001_simulate(&mut self, command: Command) {
+        let stack_from = self.stacks.get_mut(command.from).unwrap();
+
+        let moved_crates = (0..command.quantity)
+            .map(|_| stack_from.pop_front().unwrap())
+            .collect_vec();
+
+        let stack_to = self.stacks.get_mut(command.to).unwrap();
+        for moved_crate in moved_crates.into_iter().rev() {
             stack_to.push_front(moved_crate);
         }
     }
@@ -111,17 +125,23 @@ impl Solution for Five {
         let (mut stacks, commands) = parsed.to_owned();
 
         for command in commands {
-            stacks.execute_command(command);
+            stacks.cratemover_9000_simulate(command);
         }
 
         String::from_iter(stacks.get_top().into_iter().map(|c| c.0))
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        "".to_string()
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let (mut stacks, commands) = parsed.to_owned();
+
+        for command in commands {
+            stacks.cratemover_9001_simulate(command);
+        }
+
+        String::from_iter(stacks.get_top().into_iter().map(|c| c.0))
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        ("MQSHJMWNH".to_string(), "".to_string())
+        ("MQSHJMWNH".to_string(), "LLWJRBHVZ".to_string())
     }
 }
