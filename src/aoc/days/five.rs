@@ -54,13 +54,11 @@ impl From<&str> for Stacks {
 impl Stacks {
     fn execute_command(&mut self, command: Command) {
         for _ in 0..command.quantity {
-            let ciao = self.stacks.get_mut(command.from).unwrap();
-            let stuff = ciao.pop_front().unwrap();
-            drop(ciao);
+            let stack_from = self.stacks.get_mut(command.from).unwrap();
+            let moved_crate = stack_from.pop_front().unwrap();
 
-            let ciao = self.stacks.get_mut(command.to).unwrap();
-            ciao.push_front(stuff);
-            drop(ciao);
+            let stack_to = self.stacks.get_mut(command.to).unwrap();
+            stack_to.push_front(moved_crate);
         }
     }
 
