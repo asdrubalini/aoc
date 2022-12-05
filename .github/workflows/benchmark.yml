@@ -12,15 +12,23 @@ jobs:
         with:
           toolchain: stable
 
-      - uses: actions-rs/cargo@v1
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
         with:
-          command: install
-          args: cargo-criterion
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
 
-      - uses: actions-rs/cargo@v1
-        with:
-          command: install
-          args: criterion-table
+      - name: Install dependencies
+        run: |
+          cargo install cargo-criterion --locked
+          cargo install criterion-table --locked
 
       - name: Start benchmarks
         run: cargo criterion --message-format=json | criterion-table > BENCHMARKS.md
