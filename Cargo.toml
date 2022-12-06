@@ -9,6 +9,9 @@ itertools = "0.10"
 paste = "1.0"
 convert_case = "0.6"
 
+# for inputs download
+reqwest = { version = "0.11", features = [ "gzip", "rustls-tls", "blocking" ], default-features = false }
+
 [dev-dependencies]
 criterion = "0.4"
 
