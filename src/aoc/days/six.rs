@@ -4,6 +4,16 @@ use crate::aoc::Solution;
 
 pub struct Six;
 
+fn find_first_unique_index(signal: &str, unique_len: usize) -> u32 {
+    for (pos, bytes) in signal.as_bytes().windows(unique_len).enumerate() {
+        if bytes.iter().unique().count() == unique_len {
+            return (pos + unique_len) as u32;
+        }
+    }
+
+    panic!("lol")
+}
+
 impl Solution for Six {
     type Output = u32;
     type Parsed = String;
@@ -17,20 +27,14 @@ impl Solution for Six {
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
-        for (pos, (c1, c2, c3, c4)) in parsed.chars().tuple_windows().enumerate() {
-            if vec![c1, c2, c3, c4].iter().unique().count() == 4 {
-                return pos as u32 + 4;
-            }
-        }
-
-        panic!("cannot find")
+        find_first_unique_index(parsed, 4)
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        find_first_unique_index(parsed, 14)
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (1625, 2250)
     }
 }
