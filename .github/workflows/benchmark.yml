@@ -27,8 +27,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          cargo install cargo-criterion --locked
-          cargo install criterion-table --locked
+          cargo install cargo-criterion --locked || true
+          cargo install criterion-table --locked || true
 
       - name: Start benchmarks
         run: cargo criterion --message-format=json | criterion-table > BENCHMARKS.md
