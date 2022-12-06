@@ -1,12 +1,37 @@
+use std::{
+    collections::{BTreeSet, HashSet},
+    hash::Hash,
+    time::Instant,
+};
+
 use itertools::Itertools;
 
 use crate::aoc::Solution;
 
 pub struct Six;
 
+/// faster than `.unique().count() == len` since this exists
+/// as soon as a duplicated item is encountered
+/// not really necessary but day six was boring as hell
+fn all_unique<T: Hash + Eq + Ord + Copy>(items: &[T]) -> bool {
+    let mut seen: BTreeSet<T> = BTreeSet::new();
+
+    for item in items {
+        if seen.contains(item) {
+            return false;
+        }
+
+        seen.insert(*item);
+    }
+
+    true
+}
+
 fn find_first_unique_index(signal: &str, unique_len: usize) -> u32 {
+    //let start = Instant::now();
+
     for (pos, bytes) in signal.as_bytes().windows(unique_len).enumerate() {
-        if bytes.iter().unique().count() == unique_len {
+        if all_unique(bytes) {
             return (pos + unique_len) as u32;
         }
     }
