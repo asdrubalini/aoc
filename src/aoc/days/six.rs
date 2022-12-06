@@ -1,10 +1,4 @@
-use std::{
-    collections::{BTreeSet, HashSet},
-    hash::Hash,
-    time::Instant,
-};
-
-use itertools::Itertools;
+use std::{collections::BTreeSet, hash::Hash};
 
 use crate::aoc::Solution;
 

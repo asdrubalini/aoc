@@ -25,20 +25,12 @@ impl From<&str> for Rucksack {
 
 impl Rucksack {
     /// find badges contained in both left and right
+    #[inline]
     fn find_duplicates(&self) -> Vec<char> {
-        self.left
-            .iter()
-            .filter_map(|item| {
-                if self.right.contains(item) {
-                    Some(*item)
-                } else {
-                    None
-                }
-            })
-            .unique()
-            .collect()
+        self.left.intersection(&self.right).copied().collect_vec()
     }
 
+    #[inline]
     fn compute_priority(item: char) -> u32 {
         match item {
             'A'..='Z' => (item as u8 - 38) as u32, // 1 to 26
@@ -47,13 +39,9 @@ impl Rucksack {
         }
     }
 
+    #[inline]
     fn unique_badges(&self) -> Vec<char> {
-        self.left
-            .iter()
-            .merge(self.right.iter())
-            .unique()
-            .copied()
-            .collect()
+        return self.left.union(&self.right).copied().collect_vec();
     }
 }
 
@@ -99,16 +87,13 @@ impl Solution for Three {
                     }
                 }
 
-                // there should be just one badge with counter of three
-                let badge: Vec<char> = badge_counter
+                //// find the only badge with count of three
+                let badge = badge_counter
                     .iter()
-                    .filter_map(|(key, value)| if *value == 3 { Some(key) } else { None })
-                    .copied()
-                    .collect();
+                    .find_map(|(key, value)| if *value == 3 { Some(key) } else { None })
+                    .unwrap();
 
-                assert_eq!(badge.len(), 1);
-
-                badge.first().unwrap().to_owned()
+                *badge
             })
             .collect();
 
