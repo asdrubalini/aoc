@@ -1,5 +1,3 @@
-use std::collections::VecDeque;
-
 use itertools::Itertools;
 
 use crate::aoc::Solution;
@@ -18,7 +16,7 @@ impl From<char> for Crate {
 
 #[derive(Debug, Clone)]
 pub struct Stacks {
-    stacks: Vec<VecDeque<Crate>>,
+    stacks: Vec<Vec<Crate>>,
 }
 
 impl From<&str> for Stacks {
@@ -35,13 +33,13 @@ impl From<&str> for Stacks {
         let stacks = stacks_positions
             .into_iter()
             .map(|pos| {
-                let stacks: VecDeque<Crate> = lines
+                let stacks: Vec<Crate> = lines
                     .iter()
                     .skip(1)
                     .map(|line| line.chars().nth(pos).unwrap())
                     .filter(|chr| chr.is_alphabetic())
                     .map(Crate::from)
-                    .rev()
+                    //.rev()
                     .collect();
 
                 stacks
@@ -56,10 +54,10 @@ impl Stacks {
     fn cratemover_9000_simulate(&mut self, command: Command) {
         for _ in 0..command.quantity {
             let stack_from = self.stacks.get_mut(command.from).unwrap();
-            let moved_crate = stack_from.pop_front().unwrap();
+            let moved_crate = stack_from.pop().unwrap();
 
             let stack_to = self.stacks.get_mut(command.to).unwrap();
-            stack_to.push_front(moved_crate);
+            stack_to.push(moved_crate);
         }
     }
 
@@ -67,19 +65,19 @@ impl Stacks {
         let stack_from = self.stacks.get_mut(command.from).unwrap();
 
         let moved_crates = (0..command.quantity)
-            .map(|_| stack_from.pop_front().unwrap())
+            .map(|_| stack_from.pop().unwrap())
             .collect_vec();
 
         let stack_to = self.stacks.get_mut(command.to).unwrap();
         for moved_crate in moved_crates.into_iter().rev() {
-            stack_to.push_front(moved_crate);
+            stack_to.push(moved_crate);
         }
     }
 
     fn get_top(&self) -> Vec<Crate> {
         self.stacks
             .iter()
-            .map(|stack| stack.front().unwrap())
+            .map(|stack| stack.last().unwrap())
             .copied()
             .collect_vec()
     }
