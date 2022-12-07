@@ -243,21 +243,29 @@ impl Solution for Seven {
             .map(ToOwned::to_owned)
             .map(Item::Directory);
 
-        //for dir in directories {
-        //println!("{}", dir.size());
-        //}
-
         directories
-            .map(|d| {
-                println!("{:?}", d);
-                d.size()
-            })
+            .map(|d| d.size())
             .filter(|size| *size <= 100000)
             .sum()
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let directories = parsed
+            .find_all_directories()
+            .into_iter()
+            .map(ToOwned::to_owned)
+            .map(Item::Directory);
+
+        let fs_size = parsed.root.size();
+        let unused_space = 70000000 - fs_size;
+        let cleanup_required = 30000000 - unused_space;
+
+        directories
+            .map(|d| d.size())
+            .filter(|s| *s >= cleanup_required)
+            .sorted()
+            .next()
+            .unwrap()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
