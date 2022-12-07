@@ -43,18 +43,18 @@ impl From<&str> for Command {
 }
 
 #[derive(Debug, Clone)]
-struct File {
+pub struct File {
     size: usize,
 }
 
 #[derive(Debug, Clone)]
-struct Directory {
+pub struct Directory {
     contents: HashMap<OsString, Item>,
 }
 
 impl Directory {
     fn create_file(&mut self, name: OsString, size: usize) {
-        self.contents.insert(name, Item::File(File { size: size }));
+        self.contents.insert(name, Item::File(File { size }));
     }
 
     fn create_directory(&mut self, name: OsString) {
@@ -78,31 +78,11 @@ impl Item {
         matches!(self, Self::File(_))
     }
 
-    fn is_directory(&self) -> bool {
-        matches!(self, Self::Directory(_))
-    }
-
-    fn as_file_mut(&mut self) -> &mut File {
-        if let Item::File(c) = self {
-            c
-        } else {
-            panic!("not a file");
-        }
-    }
-
     fn as_directory_mut(&mut self) -> &mut Directory {
         if let Item::Directory(d) = self {
             d
         } else {
             panic!("not a directory");
-        }
-    }
-
-    fn as_file(&self) -> &File {
-        if let Item::File(c) = self {
-            c
-        } else {
-            panic!("not a file");
         }
     }
 
@@ -131,8 +111,7 @@ impl Item {
             .as_directory()
             .contents
             .values()
-            .map(|item| item.find_directories_recursive())
-            .flatten()
+            .flat_map(|item| item.find_directories_recursive())
             .collect_vec();
 
         directories.push(self.as_directory());
@@ -170,7 +149,7 @@ impl Tree {
             current_item = current_item_dir
                 .contents
                 .get_mut(&directory.to_owned())
-                .expect(&format!("cannot find directory {directory:?}"));
+                .unwrap_or_else(|| panic!("cannot find directory {directory:?}"));
         }
 
         current_item
@@ -269,6 +248,6 @@ impl Solution for Seven {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (1427048, 0)
+        (1427048, 2940614)
     }
 }
