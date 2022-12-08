@@ -15,8 +15,7 @@ impl From<&str> for Matrix {
     fn from(from: &str) -> Self {
         let inner = from
             .lines()
-            .map(|line| line.chars().collect_vec())
-            .flatten()
+            .flat_map(|line| line.chars().collect_vec())
             .map(|c| c.to_digit(10).expect("that's not a number lol") as i32)
             .collect_vec();
 
@@ -40,6 +39,44 @@ impl Matrix {
             None => panic!("cannot find"),
         }
     }
+
+    fn is_visible(&self, x: usize, y: usize) -> bool {
+        let current_height = self.at(x, y);
+
+        let obstructed_from_top = (0..y)
+            .map(|sliding_y| self.at(x, sliding_y))
+            .any(|height| height >= current_height);
+
+        if !obstructed_from_top {
+            return true;
+        }
+
+        let obstructed_from_bottom = (y + 1..self.height)
+            .map(|sliding_y| self.at(x, sliding_y))
+            .any(|height| height >= current_height);
+
+        if !obstructed_from_bottom {
+            return true;
+        }
+
+        let obstructed_from_left = (0..x)
+            .map(|sliding_x| self.at(sliding_x, y))
+            .any(|height| height >= current_height);
+
+        if !obstructed_from_left {
+            return true;
+        }
+
+        let obstructed_from_right = (x + 1..self.width)
+            .map(|sliding_x| self.at(sliding_x, y))
+            .any(|height| height >= current_height);
+
+        if !obstructed_from_right {
+            return true;
+        }
+
+        false
+    }
 }
 
 impl Solution for Eight {
@@ -58,55 +95,12 @@ impl Solution for Eight {
         // count the edges
         let mut visible_count = parsed.height * 2 + (parsed.width - 2) * 2;
 
-        for y in 1..parsed.height - 1 {
-            for x in 1..parsed.width - 1 {
-                let current_height = parsed.at(x, y);
-
-                let visible_from_top = (0..y)
-                    .map(|sliding_y| parsed.at(x, sliding_y))
-                    .filter(|height| *height >= current_height)
-                    .next()
-                    .is_none();
-
-                if visible_from_top {
-                    visible_count += 1;
-                    continue;
-                }
-
-                let visible_from_bottom = (y + 1..parsed.height)
-                    .map(|sliding_y| parsed.at(x, sliding_y))
-                    .filter(|height| *height >= current_height)
-                    .next()
-                    .is_none();
-
-                if visible_from_bottom {
-                    visible_count += 1;
-                    continue;
-                }
-
-                let visible_from_left = (0..x)
-                    .map(|sliding_x| parsed.at(sliding_x, y))
-                    .filter(|height| *height >= current_height)
-                    .next()
-                    .is_none();
-
-                if visible_from_left {
-                    visible_count += 1;
-                    continue;
-                }
-
-                let visible_from_right = (x + 1..parsed.width)
-                    .map(|sliding_x| parsed.at(sliding_x, y))
-                    .filter(|height| *height >= current_height)
-                    .next()
-                    .is_none();
-
-                if visible_from_right {
-                    visible_count += 1;
-                    continue;
-                }
-            }
-        }
+        // iterate over every single tree (except the edges) and count how many of those
+        // are visible from outside
+        visible_count += (1..parsed.height - 1)
+            .flat_map(|y| (1..parsed.width - 1).map(move |x| parsed.is_visible(x, y)))
+            .filter(|is_visible| *is_visible)
+            .count();
 
         visible_count as u32
     }
