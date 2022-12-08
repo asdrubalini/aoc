@@ -34,6 +34,9 @@ impl From<&str> for Matrix {
 
 impl Matrix {
     fn at(&self, x: usize, y: usize) -> i32 {
+        assert!(x < self.width);
+        assert!(y < self.height);
+
         match self.inner.get(y * self.width + x) {
             Some(value) => *value,
             None => panic!("cannot find"),
@@ -77,6 +80,56 @@ impl Matrix {
 
         false
     }
+
+    fn scenic_score(&self, x: usize, y: usize) -> u32 {
+        let current_height = self.at(x, y);
+
+        let mut top_score = (0..=y)
+            .rev()
+            .map(|sliding_y| self.at(x, sliding_y))
+            .skip(1)
+            .take_while(|height| current_height > *height)
+            .count();
+
+        if top_score < y {
+            top_score += 1;
+        }
+
+        let mut bottom_score = (y..self.height)
+            .map(|sliding_y| self.at(x, sliding_y))
+            .skip(1)
+            .take_while(|height| current_height > *height)
+            .count();
+
+        if bottom_score < self.height - y - 1 {
+            bottom_score += 1;
+        }
+
+        let mut left_score = (0..=x)
+            .rev()
+            .map(|sliding_x| self.at(sliding_x, y))
+            .skip(1)
+            .take_while(|height| current_height > *height)
+            .count();
+
+        if left_score < x {
+            left_score += 1;
+        }
+
+        let mut right_score = (x..self.width)
+            .map(|sliding_x| self.at(sliding_x, y))
+            .skip(1)
+            .take_while(|height| current_height > *height)
+            .count();
+
+        if right_score < self.width - x - 1 {
+            right_score += 1;
+        }
+
+        vec![top_score, bottom_score, left_score, right_score]
+            .into_iter()
+            .product::<usize>() as u32
+    }
 }
 
 impl Solution for Eight {
@@ -105,11 +158,14 @@ impl Solution for Eight {
         visible_count as u32
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let scenic_scores = (1..parsed.height - 1)
+            .flat_map(|y| (1..parsed.width - 1).map(move |x| parsed.scenic_score(x, y)));
+
+        scenic_scores.max().unwrap()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (1805, 0)
+        (1805, 444528)
     }
 }
