@@ -1,5 +1,4 @@
 use aoc::{days::*, Solution};
-use itertools::Itertools;
 
 mod aoc;
 
