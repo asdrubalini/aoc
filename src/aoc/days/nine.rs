@@ -38,10 +38,7 @@ impl From<&str> for Motions {
             .map(|line| {
                 let (direction, steps) = line.split_ascii_whitespace().collect_tuple().unwrap();
 
-                (
-                    Direction::from(direction),
-                    u32::from_str_radix(steps, 10).unwrap(),
-                )
+                (Direction::from(direction), steps.parse().unwrap())
             })
             .collect_vec();
 
@@ -62,7 +59,7 @@ impl Coord {
     }
 
     fn go_to_direction(&mut self, direction: Direction) -> Coord {
-        let previous = self.clone();
+        let previous = *self;
 
         match direction {
             Direction::Left => self.0 -= 1,
@@ -115,58 +112,10 @@ impl Solution for Nine {
 
             // then move tail in order to follow head
             while !head_coords.is_touching(&tail_coords) {
-                if (head_coords.x() - tail_coords.x()).abs() == 1 {
-                    // adjust horizontal position (move diagonally)
-                    let movement_x = if head_coords.x() - tail_coords.x() > 0 {
-                        1
-                    } else {
-                        -1
-                    };
+                let movement_x = (head_coords.x() - tail_coords.x()).signum();
+                let movement_y = (head_coords.y() - tail_coords.y()).signum();
 
-                    let movement_y = if head_coords.y() - tail_coords.y() > 0 {
-                        1
-                    } else {
-                        -1
-                    };
-
-                    tail_coords.move_by(movement_x, movement_y);
-                } else if (head_coords.y() - tail_coords.y()).abs() == 1 {
-                    // adjust vertical position (move diagonally)
-                    let movement_y = if head_coords.y() - tail_coords.y() > 0 {
-                        1
-                    } else {
-                        -1
-                    };
-
-                    let movement_x = if head_coords.x() - tail_coords.x() > 0 {
-                        1
-                    } else {
-                        -1
-                    };
-
-                    tail_coords.move_by(movement_x, movement_y);
-                } else if head_coords.x() != tail_coords.x() && head_coords.y() == tail_coords.y() {
-                    // move horizontally
-                    let movement_x = if head_coords.x() - tail_coords.x() > 0 {
-                        1
-                    } else {
-                        -1
-                    };
-
-                    tail_coords.move_by(movement_x, 0);
-                } else if head_coords.y() != tail_coords.y() && head_coords.x() == tail_coords.x() {
-                    // move vertically
-                    let movement_y = if head_coords.y() - tail_coords.y() > 0 {
-                        1
-                    } else {
-                        -1
-                    };
-
-                    tail_coords.move_by(0, movement_y);
-                } else {
-                    panic!("wtf is this");
-                }
-
+                tail_coords.move_by(movement_x, movement_y);
                 visited_by_tail.push(tail_coords);
             }
         }
@@ -179,6 +128,6 @@ impl Solution for Nine {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (6190, 0)
     }
 }
