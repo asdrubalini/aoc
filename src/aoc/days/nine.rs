@@ -95,7 +95,8 @@ impl Solution for Nine {
     type Parsed = Motions;
 
     fn input() -> &'static str {
-        include_str!("../inputs/9.txt")
+        "R 100\nU 10"
+        //include_str!("../inputs/9.txt")
     }
 
     fn parse_input(input: &'static str) -> Self::Parsed {
@@ -116,10 +117,10 @@ impl Solution for Nine {
 
             // then move tail in order to follow head
             while !head_coords.is_touching(&tail_coords) {
-                let movement_x = (head_coords.x() - tail_coords.x()).signum();
-                let movement_y = (head_coords.y() - tail_coords.y()).signum();
+                let dx = (head_coords.x() - tail_coords.x()).signum();
+                let dy = (head_coords.y() - tail_coords.y()).signum();
 
-                tail_coords.move_by(movement_x, movement_y);
+                tail_coords.move_by(dx, dy);
                 visited_by_tail.push(tail_coords);
             }
         }
@@ -144,10 +145,12 @@ impl Solution for Nine {
             for (idx, middle_coords) in other_coords.iter_mut().enumerate() {
                 // then move tail in order to follow head
                 while !prev_coords.is_touching(&middle_coords) {
-                    let movement_x = (prev_coords.x() - middle_coords.x()).signum();
-                    let movement_y = (prev_coords.y() - middle_coords.y()).signum();
+                    let dx = (prev_coords.x() - middle_coords.x()).signum();
+                    let dy = (prev_coords.y() - middle_coords.y()).signum();
 
-                    middle_coords.move_by(movement_x, movement_y);
+                    println!("{dx} {dy}");
+
+                    middle_coords.move_by(dx, dy);
 
                     if idx == 8 {
                         // 8 is the tail
