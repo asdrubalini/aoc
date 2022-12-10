@@ -95,8 +95,8 @@ impl Solution for Nine {
     type Parsed = Motions;
 
     fn input() -> &'static str {
-        "R 100\nU 10"
-        //include_str!("../inputs/9.txt")
+        //"R 100\nU 10"
+        include_str!("../inputs/9.txt")
     }
 
     fn parse_input(input: &'static str) -> Self::Parsed {
@@ -135,30 +135,31 @@ impl Solution for Nine {
         let mut visited_by_tail: Vec<Coord> = vec![Coord(0, 0)];
 
         for (direction, steps) in parsed.motions.iter() {
-            // move head first
             for _ in 0..*steps {
+                // move head first
                 head_coords.go_to_direction(*direction);
-            }
 
-            let mut prev_coords = head_coords;
+                let mut prev_coords = head_coords;
 
-            for (idx, middle_coords) in other_coords.iter_mut().enumerate() {
-                // then move tail in order to follow head
-                while !prev_coords.is_touching(&middle_coords) {
-                    let dx = (prev_coords.x() - middle_coords.x()).signum();
-                    let dy = (prev_coords.y() - middle_coords.y()).signum();
+                // then adjust the other ropes
+                for (idx, middle_coords) in other_coords.iter_mut().enumerate() {
+                    // then move tail in order to follow head
+                    while !prev_coords.is_touching(&middle_coords) {
+                        let dx = (prev_coords.x() - middle_coords.x()).signum();
+                        let dy = (prev_coords.y() - middle_coords.y()).signum();
 
-                    println!("{dx} {dy}");
+                        println!("{dx} {dy}");
 
-                    middle_coords.move_by(dx, dy);
+                        middle_coords.move_by(dx, dy);
+                    }
 
                     if idx == 8 {
                         // 8 is the tail
                         visited_by_tail.push(*middle_coords);
                     }
-                }
 
-                prev_coords = *middle_coords;
+                    prev_coords = *middle_coords;
+                }
             }
         }
 
@@ -169,6 +170,6 @@ impl Solution for Nine {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (6190, 0)
+        (6190, 2516)
     }
 }
