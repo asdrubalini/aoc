@@ -28,21 +28,24 @@ impl From<&str> for Direction {
 
 #[derive(Debug)]
 pub struct Motions {
-    motions: Vec<(Direction, u32)>,
+    motions: Vec<Direction>,
 }
 
 impl From<&str> for Motions {
     fn from(from: &str) -> Self {
-        let motions = from
-            .lines()
-            .map(|line| {
-                let (direction, steps) = line.split_ascii_whitespace().collect_tuple().unwrap();
+        let motions = from.lines().map(|line| {
+            let (direction, steps) = line.split_ascii_whitespace().collect_tuple().unwrap();
 
-                (Direction::from(direction), steps.parse().unwrap())
-            })
+            (Direction::from(direction), steps.parse::<usize>().unwrap())
+        });
+
+        let motions_flattened = motions
+            .flat_map(|(direction, steps)| vec![direction; steps])
             .collect_vec();
 
-        Motions { motions }
+        Motions {
+            motions: motions_flattened,
+        }
     }
 }
 
@@ -82,11 +85,7 @@ impl Coord {
 
     /// self is touching other when their distance is less or equal than sqrt(2)
     fn is_touching(&self, other: &Self) -> bool {
-        let x = self.distance(other) <= f64::sqrt(2.0);
-
-        //println!("is_touching({:?}, {:?}) = {}", self, other, x);
-
-        x
+        self.distance(other) <= f64::sqrt(2.0)
     }
 }
 
@@ -109,11 +108,9 @@ impl Solution for Nine {
 
         let mut visited_by_tail: Vec<Coord> = vec![tail_coords];
 
-        for (direction, steps) in parsed.motions.iter() {
+        for direction in parsed.motions.iter() {
             // move head first
-            for _ in 0..*steps {
-                head_coords.go_to_direction(*direction);
-            }
+            head_coords.go_to_direction(*direction);
 
             // then move tail in order to follow head
             while !head_coords.is_touching(&tail_coords) {
@@ -134,37 +131,28 @@ impl Solution for Nine {
 
         let mut visited_by_tail: Vec<Coord> = vec![Coord(0, 0)];
 
-        for (direction, steps) in parsed.motions.iter() {
-            for _ in 0..*steps {
-                // move head first
-                head_coords.go_to_direction(*direction);
+        for direction in parsed.motions.iter() {
+            // move head first
+            head_coords.go_to_direction(*direction);
 
-                let mut prev_coords = head_coords;
+            let mut prev_coords = head_coords;
 
-                // then adjust the other ropes
-                for (idx, middle_coords) in other_coords.iter_mut().enumerate() {
-                    // then move tail in order to follow head
-                    while !prev_coords.is_touching(&middle_coords) {
-                        let dx = (prev_coords.x() - middle_coords.x()).signum();
-                        let dy = (prev_coords.y() - middle_coords.y()).signum();
+            // then adjust the other ropes
+            for middle_coords in other_coords.iter_mut() {
+                // then move tail in order to follow head
+                while !prev_coords.is_touching(middle_coords) {
+                    let dx = (prev_coords.x() - middle_coords.x()).signum();
+                    let dy = (prev_coords.y() - middle_coords.y()).signum();
 
-                        println!("{dx} {dy}");
-
-                        middle_coords.move_by(dx, dy);
-                    }
-
-                    if idx == 8 {
-                        // 8 is the tail
-                        visited_by_tail.push(*middle_coords);
-                    }
-
-                    prev_coords = *middle_coords;
+                    middle_coords.move_by(dx, dy);
                 }
-            }
-        }
 
-        println!("{:?}", head_coords);
-        println!("{:?}", other_coords);
+                prev_coords = *middle_coords;
+            }
+
+            // last is the tail
+            visited_by_tail.push(*other_coords.last().unwrap());
+        }
 
         visited_by_tail.into_iter().unique().count() as u32
     }
