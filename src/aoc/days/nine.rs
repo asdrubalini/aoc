@@ -47,7 +47,7 @@ impl From<&str> for Motions {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct Coord(pub i32, pub i32);
+pub struct Coord(i32, i32);
 
 impl Coord {
     fn x(&self) -> i32 {
@@ -76,13 +76,17 @@ impl Coord {
         self.1 += y;
     }
 
-    pub fn distance(&self, other: &Self) -> f64 {
+    fn distance(&self, other: &Self) -> f64 {
         (((self.x() - other.x()).pow(2) + (self.y() - other.y()).pow(2)) as f64).sqrt()
     }
 
     /// self is touching other when their distance is less or equal than sqrt(2)
-    pub fn is_touching(&self, other: &Self) -> bool {
-        self.distance(other) <= f64::sqrt(2.0)
+    fn is_touching(&self, other: &Self) -> bool {
+        let x = self.distance(other) <= f64::sqrt(2.0);
+
+        //println!("is_touching({:?}, {:?}) = {}", self, other, x);
+
+        x
     }
 }
 
@@ -123,8 +127,42 @@ impl Solution for Nine {
         visited_by_tail.into_iter().unique().count() as u32
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut head_coords = Coord(0, 0);
+        let mut other_coords = vec![Coord(0, 0); 9];
+
+        let mut visited_by_tail: Vec<Coord> = vec![Coord(0, 0)];
+
+        for (direction, steps) in parsed.motions.iter() {
+            // move head first
+            for _ in 0..*steps {
+                head_coords.go_to_direction(*direction);
+            }
+
+            let mut prev_coords = head_coords;
+
+            for (idx, middle_coords) in other_coords.iter_mut().enumerate() {
+                // then move tail in order to follow head
+                while !prev_coords.is_touching(&middle_coords) {
+                    let movement_x = (prev_coords.x() - middle_coords.x()).signum();
+                    let movement_y = (prev_coords.y() - middle_coords.y()).signum();
+
+                    middle_coords.move_by(movement_x, movement_y);
+
+                    if idx == 8 {
+                        // 8 is the tail
+                        visited_by_tail.push(*middle_coords);
+                    }
+                }
+
+                prev_coords = *middle_coords;
+            }
+        }
+
+        println!("{:?}", head_coords);
+        println!("{:?}", other_coords);
+
+        visited_by_tail.into_iter().unique().count() as u32
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
