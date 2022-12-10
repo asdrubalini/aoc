@@ -92,7 +92,7 @@ impl Display for Matrix {
 }
 
 impl Solution for Ten {
-    type Output = i32;
+    type Output = u64;
     type Parsed = Vec<Instruction>;
 
     fn input() -> &'static str {
@@ -120,7 +120,7 @@ impl Solution for Ten {
         [20, 60, 100, 140, 180, 220]
             .into_iter()
             .map(|i| values[i - 1] * i as i32)
-            .sum::<i32>()
+            .sum::<i32>() as u64
     }
 
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
@@ -146,7 +146,8 @@ impl Solution for Ten {
             crt_pos += 1;
         }
 
-        println!("{}", matrix);
+        let matrix_str = format!("{matrix}");
+        println!("{matrix_str}");
 
         // expected solution is
         // ###  ###    ## #    #### #  # #    ###
@@ -156,10 +157,16 @@ impl Solution for Ten {
         // #  # # #  #  # #    #    #  # #    #
         // ###  #  #  ##  #### #     ##  #### #
 
-        0
+        // convert solution to some sort of hash so we can return a i32
+        matrix_str
+            .chars()
+            .into_iter()
+            .enumerate()
+            .map(|(idx, c)| if c == '#' { idx as u64 } else { 1 })
+            .sum()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (12980, 0)
+        (12980, 11073)
     }
 }
