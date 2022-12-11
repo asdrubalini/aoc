@@ -1,5 +1,4 @@
-use core::num;
-use std::{collections::VecDeque, mem::take};
+use std::collections::{HashMap, VecDeque};
 
 use itertools::Itertools;
 
@@ -32,21 +31,90 @@ impl From<&str> for Operation {
 }
 
 impl Operation {
-    fn apply(&self, a: u64) -> u64 {
+    fn apply(&self, mut worry_level: WorryLevel) -> WorryLevel {
         match self {
-            Operation::Sum(b) => a + b,
-            Operation::Product(b) => a * b,
-            Operation::Square => a * a,
+            Operation::Sum(a) => {
+                worry_level.worry_level += a;
+                worry_level.divisible_by = WorryLevel::find_dividends(worry_level.worry_level);
+            }
+            Operation::Product(a) => {
+                worry_level.worry_level *= a;
+                worry_level.divisible_by = WorryLevel::find_dividends(worry_level.worry_level);
+            }
+            Operation::Square => {
+                worry_level.worry_level *= worry_level.worry_level;
+                worry_level.divisible_by = WorryLevel::find_dividends(worry_level.worry_level);
+            }
         }
+
+        worry_level
+    }
+
+    fn apply_soft(&self, mut worry_level: WorryLevel) -> WorryLevel {
+        match self {
+            Operation::Sum(a) => {
+                let sum = worry_level.worry_level + *a;
+                worry_level.worry_level = sum;
+                worry_level.divisible_by = WorryLevel::find_dividends(sum);
+            }
+            Operation::Product(a) => match *a {
+                3 => {
+                    *worry_level.divisible_by.get_mut(&3).unwrap() = true;
+                }
+                19 => {
+                    *worry_level.divisible_by.get_mut(&19).unwrap() = true;
+                }
+                _ => panic!("wtf"),
+            },
+            Operation::Square => {
+                *worry_level.divisible_by.get_mut(&2).unwrap() = true;
+            }
+        }
+
+        worry_level
+    }
+}
+
+#[derive(Debug, Clone)]
+pub struct WorryLevel {
+    worry_level: u64,
+    divisible_by: HashMap<u8, bool>,
+}
+
+impl WorryLevel {
+    fn is_divisible_by(&self, dividend: u8) -> bool {
+        *self.divisible_by.get(&dividend).unwrap()
+    }
+
+    fn find_dividends(worry_level: u64) -> HashMap<u8, bool> {
+        [2, 3, 5, 7, 11, 13, 17, 19, 23]
+            .map(|dividend| (dividend as u8, worry_level % dividend == 0))
+            .into()
+    }
+}
+
+impl From<u64> for WorryLevel {
+    fn from(worry_level: u64) -> Self {
+        let divisible_by = Self::find_dividends(worry_level);
+
+        WorryLevel {
+            worry_level,
+            divisible_by,
+        }
+    }
+}
+
+impl Into<u64> for WorryLevel {
+    fn into(self) -> u64 {
+        self.worry_level
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct Monkey {
-    id: usize,
-    items_worry_level: VecDeque<u64>,
+    items_worry_level: VecDeque<WorryLevel>,
     operation: Operation,
-    test_divisible_by: u64,
+    test_divisible_by: u8,
     condition_true_monkey: usize,
     condition_false_monkey: usize,
     inspection_count: u32,
@@ -56,21 +124,14 @@ impl From<&str> for Monkey {
     fn from(monkey: &str) -> Self {
         let mut lines = monkey.lines().map(|line| line.trim());
 
-        let id = {
-            let line = lines
-                .next()
-                .unwrap()
-                .replace("Monkey ", "")
-                .replace(":", "");
-
-            println!("{line}");
-            line.parse::<usize>().unwrap()
-        };
+        // skip id
+        lines.next();
 
         let items_worry_level = {
             let line = lines.next().unwrap().replace("Starting items: ", "");
             line.split(", ")
                 .map(|item| item.parse::<u64>().unwrap())
+                .map(WorryLevel::from)
                 .collect_vec()
         };
 
@@ -81,7 +142,7 @@ impl From<&str> for Monkey {
 
         let test_divisible_by = {
             let divisible_by = lines.next().unwrap().replace("Test: divisible by ", "");
-            divisible_by.parse::<u64>().unwrap()
+            divisible_by.parse::<u8>().unwrap()
         };
 
         let condition_true_monkey = {
@@ -103,7 +164,6 @@ impl From<&str> for Monkey {
         };
 
         Monkey {
-            id,
             items_worry_level: VecDeque::from(items_worry_level),
             operation,
             test_divisible_by,
@@ -116,11 +176,38 @@ impl From<&str> for Monkey {
 }
 
 impl Solution for Eleven {
-    type Output = u32;
+    type Output = u128;
     type Parsed = Vec<Monkey>;
 
     fn input() -> &'static str {
-        include_str!("../inputs/11.txt")
+        "Monkey 0:
+  Starting items: 79, 98
+  Operation: new = old * 19
+  Test: divisible by 23
+    If true: throw to monkey 2
+    If false: throw to monkey 3
+
+Monkey 1:
+  Starting items: 54, 65, 75, 74
+  Operation: new = old + 6
+  Test: divisible by 19
+    If true: throw to monkey 2
+    If false: throw to monkey 0
+
+Monkey 2:
+  Starting items: 79, 60, 97
+  Operation: new = old * old
+  Test: divisible by 13
+    If true: throw to monkey 1
+    If false: throw to monkey 3
+
+Monkey 3:
+  Starting items: 74
+  Operation: new = old + 3
+  Test: divisible by 17
+    If true: throw to monkey 0
+    If false: throw to monkey 1"
+        //include_str!("../inputs/11.txt")
     }
 
     fn parse_input(input: &'static str) -> Self::Parsed {
@@ -147,19 +234,21 @@ impl Solution for Eleven {
                     monkey
                 };
 
-                while let Some(item) = monkey.items_worry_level.pop_front() {
-                    let worry_level = monkey.operation.apply(item) as f64;
+                while let Some(worry_level) = monkey.items_worry_level.pop_front() {
+                    let worry_level = monkey.operation.apply(worry_level).worry_level as f64;
                     let worry_level = (worry_level / 3.0).floor();
 
-                    let other_monkey = monkeys
-                        .get_mut(if worry_level % monkey.test_divisible_by as f64 == 0.0 {
-                            monkey.condition_true_monkey
-                        } else {
-                            monkey.condition_false_monkey
-                        })
-                        .unwrap();
+                    let monkey_id = if worry_level % monkey.test_divisible_by as f64 == 0.0 {
+                        monkey.condition_true_monkey
+                    } else {
+                        monkey.condition_false_monkey
+                    };
 
-                    other_monkey.items_worry_level.push_back(worry_level as u64);
+                    let destination_monkey = monkeys.get_mut(monkey_id).unwrap();
+
+                    destination_monkey
+                        .items_worry_level
+                        .push_back((worry_level as u64).into());
                 }
             }
         }
@@ -170,11 +259,54 @@ impl Solution for Eleven {
             .sorted()
             .rev()
             .take(2)
-            .product::<u32>()
+            .product::<u32>() as u128
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut monkeys = parsed.to_owned();
+
+        for _ in 0..10_000 {
+            for monkey_id in 0..monkeys.len() {
+                let mut monkey = {
+                    let monkey_mut = monkeys.get_mut(monkey_id).unwrap();
+                    monkey_mut.inspection_count += monkey_mut.items_worry_level.len() as u32;
+                    let monkey = monkey_mut.to_owned();
+
+                    // take out the items
+                    monkey_mut.items_worry_level = VecDeque::new();
+
+                    monkey
+                };
+
+                while let Some(worry_level) = monkey.items_worry_level.pop_front() {
+                    let worry_level = monkey.operation.apply_soft(worry_level);
+
+                    let monkey_id = if worry_level.is_divisible_by(monkey.test_divisible_by as u8) {
+                        monkey.condition_true_monkey
+                    } else {
+                        monkey.condition_false_monkey
+                    };
+
+                    let destination_monkey = monkeys.get_mut(monkey_id).unwrap();
+
+                    destination_monkey.items_worry_level.push_back(worry_level);
+                }
+            }
+        }
+
+        println!(
+            "{:?}",
+            monkeys.iter().map(|m| m.inspection_count).collect_vec()
+        );
+
+        monkeys
+            .into_iter()
+            .map(|m| m.inspection_count)
+            .sorted()
+            .rev()
+            .take(2)
+            .map(|n| n as u128)
+            .product::<u128>()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
