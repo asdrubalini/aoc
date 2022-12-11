@@ -8,8 +8,8 @@ pub struct Eleven;
 
 #[derive(Debug, Clone)]
 pub enum Operation {
-    Sum(u64),
-    Product(u64),
+    Sum(u8),
+    Product(u8),
     Square,
 }
 
@@ -34,16 +34,13 @@ impl Operation {
     fn apply(&self, mut worry_level: WorryLevel) -> WorryLevel {
         match self {
             Operation::Sum(a) => {
-                worry_level.worry_level += a;
-                worry_level.divisible_by = WorryLevel::find_dividends(worry_level.worry_level);
+                worry_level.worry_level += *a as u64;
             }
             Operation::Product(a) => {
-                worry_level.worry_level *= a;
-                worry_level.divisible_by = WorryLevel::find_dividends(worry_level.worry_level);
+                worry_level.worry_level *= *a as u64;
             }
             Operation::Square => {
                 worry_level.worry_level *= worry_level.worry_level;
-                worry_level.divisible_by = WorryLevel::find_dividends(worry_level.worry_level);
             }
         }
 
@@ -53,21 +50,21 @@ impl Operation {
     fn apply_soft(&self, mut worry_level: WorryLevel) -> WorryLevel {
         match self {
             Operation::Sum(a) => {
-                let sum = worry_level.worry_level + *a;
+                let sum = worry_level.worry_level + *a as u64;
                 worry_level.worry_level = sum;
                 worry_level.divisible_by = WorryLevel::find_dividends(sum);
             }
             Operation::Product(a) => match *a {
                 3 => {
-                    *worry_level.divisible_by.get_mut(&3).unwrap() = true;
+                    worry_level.set_divisible(3);
                 }
                 19 => {
-                    *worry_level.divisible_by.get_mut(&19).unwrap() = true;
+                    worry_level.set_divisible(19);
                 }
                 _ => panic!("wtf"),
             },
             Operation::Square => {
-                *worry_level.divisible_by.get_mut(&2).unwrap() = true;
+                //*worry_level.divisible_by.get_mut(&2).unwrap() = true;
             }
         }
 
@@ -90,6 +87,11 @@ impl WorryLevel {
         [2, 3, 5, 7, 11, 13, 17, 19, 23]
             .map(|dividend| (dividend as u8, worry_level % dividend == 0))
             .into()
+    }
+
+    fn set_divisible(&mut self, dividend: u8) {
+        let ciao = self.divisible_by.get_mut(&dividend).unwrap();
+        *ciao = true;
     }
 }
 
