@@ -1,109 +1,28 @@
-use std::collections::{HashMap, HashSet};
-
-use itertools::Itertools;
-
 use crate::aoc::Solution;
 
 pub struct Three;
 
-#[derive(Debug, Clone)]
-pub struct Rucksack {
-    left: HashSet<char>,
-    right: HashSet<char>,
-}
-
-impl From<&str> for Rucksack {
-    fn from(input: &str) -> Self {
-        let (left, right) = input.split_at(input.len() / 2);
-
-        Self {
-            left: HashSet::from_iter(left.chars()),
-            right: HashSet::from_iter(right.chars()),
-        }
-    }
-}
-
-impl Rucksack {
-    /// find badges contained in both left and right
-    #[inline]
-    fn find_duplicates(&self) -> Vec<char> {
-        self.left.intersection(&self.right).copied().collect_vec()
-    }
-
-    #[inline]
-    fn compute_priority(item: char) -> u32 {
-        match item {
-            'A'..='Z' => (item as u8 - 38) as u32, // 1 to 26
-            'a'..='z' => (item as u8 - 96) as u32, // 26 to 52
-            _ => panic!("wtf"),
-        }
-    }
-
-    #[inline]
-    fn unique_badges(&self) -> Vec<char> {
-        return self.left.union(&self.right).copied().collect_vec();
-    }
-}
-
 impl Solution for Three {
     type Output = u32;
-    type Parsed = Vec<Rucksack>;
+    type Parsed = Vec<u32>;
 
     fn input() -> &'static str {
-        include_str!("../inputs/3.txt")
+        ""
     }
 
-    fn parse_input(input: &'static str) -> Self::Parsed {
-        input.lines().map(Rucksack::from).collect()
+    fn parse_input(_input: &'static str) -> Self::Parsed {
+        vec![]
     }
 
-    fn solve_first(parsed: &Self::Parsed) -> Self::Output {
-        parsed
-            .iter()
-            .map(|rucksack| {
-                let duplicates = rucksack.find_duplicates();
-
-                // find duplicate badges and sum the priorities
-                duplicates
-                    .into_iter()
-                    .map(Rucksack::compute_priority)
-                    .sum::<u32>()
-            })
-            .sum::<u32>()
+    fn solve_first(_parsed: &Self::Parsed) -> Self::Output {
+        0
     }
 
-    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
-        let group_badges: Vec<char> = parsed
-            .iter()
-            .chunks(3)
-            .into_iter()
-            .map(|rucksucks| {
-                let mut badge_counter: HashMap<char, u8> = HashMap::new();
-
-                // count how many times each badge appears
-                for sack in rucksucks.map(|r| r.unique_badges()) {
-                    for badge in sack {
-                        *badge_counter.entry(badge).or_default() += 1;
-                    }
-                }
-
-                //// find the only badge with count of three
-                let badge = badge_counter
-                    .iter()
-                    .find_map(|(key, value)| if *value == 3 { Some(key) } else { None })
-                    .unwrap();
-
-                *badge
-            })
-            .collect();
-
-        group_badges
-            .iter()
-            .map(|c| Rucksack::compute_priority(*c))
-            .sum::<u32>()
+    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
+        0
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (7824, 2798)
+        (0, 0)
     }
 }

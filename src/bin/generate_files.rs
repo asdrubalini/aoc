@@ -33,7 +33,7 @@ impl Solution for DAY_NAME {
 }";
 
     let days = vec![
-        // "One",
+        "One",
         "Two",
         "Three",
         "Four",
