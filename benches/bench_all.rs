@@ -1,4 +1,4 @@
-use advent_of_code_2021::aoc::{days::*, Solution};
+use advent_of_code_2015::aoc::{days::*, Solution};
 use criterion::{criterion_group, criterion_main, Criterion};
 
 /// Generate benches for day n
