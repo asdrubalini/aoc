@@ -1,6 +1,7 @@
 use std::fmt::Debug;
 
 pub mod days;
+mod utils;
 
 pub trait Solution {
     type Output: Eq + Debug;
