@@ -1,8 +1,11 @@
 #![allow(dead_code)]
+use core::panic;
 use std::{
     collections::{hash_map, HashMap},
     fmt::Debug,
 };
+
+use itertools::Itertools;
 
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct Coord(pub i32, pub i32);
@@ -31,9 +34,23 @@ impl From<(i32, i32)> for Coord {
     }
 }
 
+/// Parse "123,321"
+impl From<&str> for Coord {
+    fn from(value: &str) -> Self {
+        let (x, y) = value.split(',').collect_tuple().unwrap();
+
+        let x = x.parse::<i32>().unwrap();
+        let y = y.parse::<i32>().unwrap();
+
+        Coord(x, y)
+    }
+}
+
 #[derive(Debug)]
 pub struct InfiniteMatrix<T: Debug> {
     inner: HashMap<Coord, T>,
+
+    fixed: bool,
 
     // top_left_corner
     // +---------------+
@@ -51,6 +68,7 @@ pub struct InfiniteMatrix<T: Debug> {
 impl<T: Debug> Default for InfiniteMatrix<T> {
     fn default() -> Self {
         Self {
+            fixed: false,
             inner: HashMap::new(),
             top_left_corner: Coord(0, 0),
             bottom_right_corner: Coord(0, 0),
@@ -76,6 +94,15 @@ impl<T: Debug> InfiniteMatrix<T> {
         m
     }
 
+    pub fn new_fixed(width: i32, height: i32) -> Self {
+        InfiniteMatrix {
+            inner: HashMap::default(),
+            top_left_corner: Coord(-1, height),
+            bottom_right_corner: Coord(width, -1),
+            fixed: true,
+        }
+    }
+
     fn coord_is_in_matrix(&self, coord: Coord) -> bool {
         coord.x() > self.top_left_corner.x()
             && coord.x() < self.bottom_right_corner.x()
@@ -84,6 +111,10 @@ impl<T: Debug> InfiniteMatrix<T> {
     }
 
     fn expand_corners_to_fit(&mut self, coord: Coord) {
+        if self.fixed {
+            panic!("Trying to expand a fixed Matrix");
+        }
+
         if coord.x() <= self.top_left_corner.x() {
             *self.top_left_corner.x_mut() = coord.x() - 1;
         }
