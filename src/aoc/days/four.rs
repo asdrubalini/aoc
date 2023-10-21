@@ -38,11 +38,29 @@ impl Solution for Four {
         nonce
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut nonce: u32 = 0;
+        let starts_with = "000000";
+
+        loop {
+            let mut hasher = Md5::new();
+            hasher.update(parsed);
+            hasher.update(nonce.to_string());
+
+            let result = hasher.finalize();
+            let hash = base16ct::lower::encode_string(&result);
+
+            if hash.starts_with(starts_with) {
+                break;
+            }
+
+            nonce += 1;
+        }
+
+        nonce
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (346386, 0)
     }
 }
