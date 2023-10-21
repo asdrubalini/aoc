@@ -116,6 +116,6 @@ impl Solution for Three {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (2592, 0)
+        (2592, 2360)
     }
 }
