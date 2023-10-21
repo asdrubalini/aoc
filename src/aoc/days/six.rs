@@ -92,8 +92,29 @@ impl Solution for Six {
         m.into_iter().filter(|(_, status)| *status).count() as u32
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut m = InfiniteMatrix::<u16>::new_fixed(1000, 1000);
+
+        for instruction in parsed {
+            for y in instruction.from.y()..=instruction.through.y() {
+                for x in instruction.from.x()..=instruction.through.x() {
+                    let coord = Coord(x, y);
+                    let entry = m.entry(coord);
+
+                    match instruction.action {
+                        Action::On => *entry.or_default() += 1,
+                        Action::Off => {
+                            let light = entry.or_default();
+                            *light = light.saturating_sub(1);
+                        }
+                        Action::Toggle => *entry.or_default() += 2,
+                    }
+                }
+            }
+        }
+
+        // Count how many lights are lit
+        m.into_iter().map(|(_, status)| status as u32).sum::<u32>()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
