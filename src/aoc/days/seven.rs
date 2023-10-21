@@ -21,7 +21,7 @@ impl From<&&str> for Wire {
 }
 
 impl Wire {
-    fn get_number(&self, cpu: &CPU) -> u16 {
+    fn get_number(&self, cpu: &Circuit) -> u16 {
         match self {
             Wire::Constant(constant) => *constant,
             Wire::Named(_) => cpu.get(self),
@@ -82,11 +82,11 @@ impl From<&str> for Instruction {
 }
 
 #[derive(Default)]
-pub struct CPU {
+pub struct Circuit {
     state: HashMap<Wire, u16>,
 }
 
-impl CPU {
+impl Circuit {
     fn dump_wires(&self) {
         for (wire, value) in &self.state {
             if let Wire::Named(name) = wire {
@@ -161,7 +161,7 @@ impl Solution for Seven {
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
-        let mut cpu = CPU::default();
+        let mut cpu = Circuit::default();
 
         for instruction in parsed {
             cpu.exec(instruction);
