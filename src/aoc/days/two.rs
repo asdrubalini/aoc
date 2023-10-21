@@ -1,5 +1,3 @@
-use std::vec;
-
 use itertools::Itertools;
 
 use crate::aoc::Solution;
@@ -23,14 +21,14 @@ impl From<(u16, u16, u16)> for Box {
 
 impl Box {
     fn required_paper_area(&self) -> u32 {
-        let sides = vec![self.l * self.w, self.w * self.h, self.h * self.l];
+        let sides = [self.l * self.w, self.w * self.h, self.h * self.l];
         let smallest_side = *sides.iter().min().unwrap();
 
         sides.iter().sum::<u16>() as u32 * 2 + smallest_side as u32
     }
 
     fn required_ribbon_length(&self) -> u32 {
-        let perimeters = vec![self.l + self.w, self.w + self.h, self.h + self.l]
+        let perimeters = [self.l + self.w, self.w + self.h, self.h + self.l]
             .into_iter()
             .map(|p| p * 2)
             .collect_vec();
@@ -66,10 +64,7 @@ impl Solution for Two {
     }
 
     fn parse_input(input: &'static str) -> Self::Parsed {
-        input
-            .lines()
-            .map(|line| Self::parse_line(line))
-            .collect_vec()
+        input.lines().map(Self::parse_line).collect_vec()
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
