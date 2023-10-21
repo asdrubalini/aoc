@@ -43,7 +43,7 @@ impl From<&str> for Instruction {
     fn from(value: &str) -> Self {
         let tokens = value.split(' ').collect_vec();
 
-        let first_token = *tokens.get(0).unwrap();
+        let first_token = *tokens.first().unwrap();
         let second_token = *tokens.get(1).unwrap();
 
         // NOT is the only token that comes in the first position
@@ -57,14 +57,17 @@ impl From<&str> for Instruction {
         // Handle all the other instructions where the label is at the second position
         match second_token {
             "->" => {
-                let value = tokens.get(0).unwrap().into();
+                let value = tokens.first().unwrap().into();
                 let dst = tokens.get(2).unwrap().into();
 
                 Instruction::Load { dst, value }
             }
 
             "AND" | "OR" | "LSHIFT" | "RSHIFT" => {
-                let src = (tokens.get(0).unwrap().into(), tokens.get(2).unwrap().into());
+                let src = (
+                    tokens.first().unwrap().into(),
+                    tokens.get(2).unwrap().into(),
+                );
                 let dst = tokens.get(4).unwrap().into();
 
                 match second_token {
