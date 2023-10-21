@@ -4,6 +4,29 @@ use crate::aoc::Solution;
 
 pub struct Four;
 
+impl Four {
+    fn mine(secret_key: impl AsRef<str>, required_prefix: impl AsRef<str>) -> u32 {
+        let mut nonce: u32 = 0;
+
+        loop {
+            let mut hasher = Md5::new();
+            hasher.update(secret_key.as_ref());
+            hasher.update(nonce.to_string());
+
+            let result = hasher.finalize();
+            let hash = base16ct::lower::encode_string(&result);
+
+            if hash.starts_with(required_prefix.as_ref()) {
+                break;
+            }
+
+            nonce += 1;
+        }
+
+        nonce
+    }
+}
+
 impl Solution for Four {
     type Output = u32;
     type Parsed = String;
@@ -17,50 +40,14 @@ impl Solution for Four {
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
-        let mut nonce: u32 = 0;
-        let starts_with = "00000";
-
-        loop {
-            let mut hasher = Md5::new();
-            hasher.update(parsed);
-            hasher.update(nonce.to_string());
-
-            let result = hasher.finalize();
-            let hash = base16ct::lower::encode_string(&result);
-
-            if hash.starts_with(starts_with) {
-                break;
-            }
-
-            nonce += 1;
-        }
-
-        nonce
+        Self::mine(parsed, "00000")
     }
 
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
-        let mut nonce: u32 = 0;
-        let starts_with = "000000";
-
-        loop {
-            let mut hasher = Md5::new();
-            hasher.update(parsed);
-            hasher.update(nonce.to_string());
-
-            let result = hasher.finalize();
-            let hash = base16ct::lower::encode_string(&result);
-
-            if hash.starts_with(starts_with) {
-                break;
-            }
-
-            nonce += 1;
-        }
-
-        nonce
+        Self::mine(parsed, "000000")
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (346386, 0)
+        (346386, 9958218)
     }
 }

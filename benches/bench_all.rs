@@ -26,13 +26,13 @@ fn criterion_benchmark(c: &mut Criterion) {
     bench_day!(c, Two);
     bench_day!(c, Three);
     bench_day!(c, Four);
-    bench_day!(c, Five);
-    bench_day!(c, Six);
-    bench_day!(c, Seven);
-    bench_day!(c, Eight);
-    bench_day!(c, Nine);
-    bench_day!(c, Ten);
 
+    // bench_day!(c, Five);
+    // bench_day!(c, Six);
+    // bench_day!(c, Seven);
+    // bench_day!(c, Eight);
+    // bench_day!(c, Nine);
+    // bench_day!(c, Ten);
     // bench_day!(c, Eleven);
     // bench_day!(c, Twelve);
     // bench_day!(c, Thirteen);
