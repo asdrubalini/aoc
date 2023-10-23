@@ -19,6 +19,8 @@ pub struct Reindeer {
     flying_for: u16,
     resting_for: u16,
     space_travelled: u32,
+
+    points: u32,
 }
 
 impl From<&str> for Reindeer {
@@ -39,6 +41,8 @@ impl From<&str> for Reindeer {
             flying_for: 0,
             resting_for: 0,
             space_travelled: 0,
+
+            points: 0,
         }
     }
 }
@@ -70,6 +74,10 @@ impl Reindeer {
             }
         }
     }
+
+    fn make_tick_winner(&mut self) {
+        self.points += 1;
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -90,11 +98,27 @@ impl Reindeers {
         for reindeer in self.inner.iter_mut() {
             reindeer.tick();
         }
+
+        for reindeer in self.furthest_reindeers() {
+            reindeer.make_tick_winner();
+        }
     }
 
-    fn fastest(&self) -> Reindeer {
+    fn furthest_reindeers(&mut self) -> Vec<&mut Reindeer> {
+        self.inner
+            .sort_by(|a, b| a.space_travelled.cmp(&b.space_travelled));
+
+        let first = *self.inner.last().unwrap();
+
+        self.inner
+            .iter_mut()
+            .filter(|reindeer| reindeer.space_travelled == first.space_travelled)
+            .collect_vec()
+    }
+
+    fn winner(&self) -> Reindeer {
         let mut sorted = self.inner.clone();
-        sorted.sort_by(|a, b| a.space_travelled.cmp(&b.space_travelled));
+        sorted.sort_by(|a, b| a.points.cmp(&b.points));
 
         *sorted.last().unwrap()
     }
@@ -107,8 +131,6 @@ impl Solution for Thirteen {
     type Parsed = Reindeers;
 
     fn input() -> &'static str {
-        // return "Comet can fly 14 km/s for 10 seconds, but then must rest for 127 seconds.
-        // Dancer can fly 16 km/s for 11 seconds, but then must rest for 162 seconds.";
         include_str!("../inputs/13.txt")
     }
 
@@ -123,16 +145,24 @@ impl Solution for Thirteen {
             reindeers.tick();
         }
 
-        dbg!(&reindeers);
-
-        reindeers.fastest().space_travelled
+        reindeers
+            .furthest_reindeers()
+            .first()
+            .unwrap()
+            .space_travelled
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut reindeers = parsed.to_owned();
+
+        for _ in 0..2503 {
+            reindeers.tick();
+        }
+
+        reindeers.winner().points
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (2655, 0)
+        (2655, 1059)
     }
 }
