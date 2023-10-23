@@ -1,10 +1,9 @@
-use std::vec;
+use std::collections::HashMap;
 
 use itertools::Itertools;
-use petgraph::{algo::min_spanning_tree, prelude::UnGraph};
-use petgraph_evcxr::draw_graph;
+use petgraph::{algo::min_spanning_tree, graph::NodeIndex, prelude::UnGraph};
 
-use crate::aoc::{utils::UniqueIndexMap, Solution};
+use crate::aoc::Solution;
 
 #[derive(Debug, Clone, Copy)]
 pub struct Connection {
@@ -32,38 +31,30 @@ impl Connection {
 
 #[derive(Debug)]
 pub struct Connections {
-    inner: Vec<Connection>,
-    ids: UniqueIndexMap<String>,
+    nodes: HashMap<String, NodeIndex>,
+    pub graph: UnGraph<String, u16>,
 }
 
 impl<'a> FromIterator<&'a str> for Connections {
     fn from_iter<T: IntoIterator<Item = &'a str>>(lines: T) -> Self {
-        let mut ids = UniqueIndexMap::default();
+        let mut nodes = HashMap::new();
+        let mut graph = UnGraph::new_undirected();
 
-        let connections = lines
-            .into_iter()
-            .map(Connection::parse)
-            .map(|(from, to, distance)| {
-                let from = ids.obtain_id(from);
-                let to = ids.obtain_id(to);
+        for (from, to, distance) in lines.into_iter().map(Connection::parse) {
+            let from_node = nodes
+                .entry(from.clone())
+                .or_insert_with(|| graph.add_node(from))
+                .to_owned();
 
-                Connection::new(from, to, distance)
-            })
-            .collect_vec();
+            let to_node = nodes
+                .entry(to.clone())
+                .or_insert_with(|| graph.add_node(to))
+                .to_owned();
 
-        Connections {
-            inner: connections,
-            ids,
+            graph.add_edge(from_node, to_node, distance);
         }
-    }
-}
 
-impl IntoIterator for &Connections {
-    type Item = Connection;
-    type IntoIter = vec::IntoIter<Connection>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.inner.to_owned().into_iter()
+        Connections { nodes, graph }
     }
 }
 
@@ -82,17 +73,18 @@ impl Solution for Nine {
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
-        let data = parsed
-            .into_iter()
-            .map(|connection| (connection.from, connection.to, connection.distance));
+        let tree = min_spanning_tree(&parsed.graph);
 
-        let mut graph = UnGraph::<u32, u16>::from_edges(data);
-
-        let ciao = min_spanning_tree(&graph);
-
-        let x = ciao.into_iter();
-
-        0
+        tree.into_iter()
+            .filter_map(|e| match e {
+                petgraph::data::Element::Node { weight: _ } => None,
+                petgraph::data::Element::Edge {
+                    source: _,
+                    target: _,
+                    weight,
+                } => Some(weight as u32),
+            })
+            .sum()
     }
 
     fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
