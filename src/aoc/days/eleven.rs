@@ -88,13 +88,17 @@ impl AddAssign<u32> for Password {
         for _ in 0..rhs {
             let mut curr_idx = chars.len() - 1;
 
-            while curr_idx >= 0 {
+            loop {
                 let curr_chr = chars.get_mut(curr_idx).unwrap();
                 *curr_chr = next_char(*curr_chr);
 
                 if *curr_chr != 'a' {
                     break;
                 } else {
+                    if curr_idx == 0 {
+                        return;
+                    }
+
                     curr_idx -= 1;
                 }
             }

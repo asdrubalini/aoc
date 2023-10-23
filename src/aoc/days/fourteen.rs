@@ -4,7 +4,6 @@ use crate::aoc::Solution;
 
 #[derive(Debug)]
 pub struct Ingredient {
-    name: String,
     capacity: i32,
     durability: i32,
     flavor: i32,
@@ -17,16 +16,13 @@ impl From<&str> for Ingredient {
         // Frosting: capacity 4, durability -2, flavor 0, texture 0, calories 5
         let tokens = line.split(' ').collect_vec();
 
-        let name = tokens.first().unwrap().replace(":", "");
-
-        let capacity = tokens.get(2).unwrap().replace(",", "").parse().unwrap();
-        let durability = tokens.get(4).unwrap().replace(",", "").parse().unwrap();
-        let flavor = tokens.get(6).unwrap().replace(",", "").parse().unwrap();
-        let texture = tokens.get(8).unwrap().replace(",", "").parse().unwrap();
-        let calories = tokens.get(10).unwrap().replace(",", "").parse().unwrap();
+        let capacity = tokens.get(2).unwrap().replace(',', "").parse().unwrap();
+        let durability = tokens.get(4).unwrap().replace(',', "").parse().unwrap();
+        let flavor = tokens.get(6).unwrap().replace(',', "").parse().unwrap();
+        let texture = tokens.get(8).unwrap().replace(',', "").parse().unwrap();
+        let calories = tokens.get(10).unwrap().replace(',', "").parse().unwrap();
 
         Ingredient {
-            name,
             capacity,
             durability,
             flavor,
@@ -50,7 +46,7 @@ impl FromIterator<Ingredient> for Ingredients {
 }
 
 impl Ingredients {
-    fn compute_total_score(&self, teaspoons: &[i32]) -> u32 {
+    fn compute_total_score(&self, teaspoons: &[i32]) -> (u32, Option<i32>) {
         let capacity: i32 = self
             .inner
             .iter()
@@ -59,7 +55,7 @@ impl Ingredients {
             .sum();
 
         if capacity <= 0 {
-            return 0;
+            return (0, None);
         }
 
         let durability: i32 = self
@@ -70,7 +66,7 @@ impl Ingredients {
             .sum();
 
         if durability <= 0 {
-            return 0;
+            return (0, None);
         }
 
         let flavor: i32 = self
@@ -81,7 +77,7 @@ impl Ingredients {
             .sum();
 
         if flavor <= 0 {
-            return 0;
+            return (0, None);
         }
 
         let texture: i32 = self
@@ -92,10 +88,20 @@ impl Ingredients {
             .sum();
 
         if texture <= 0 {
-            return 0;
+            return (0, None);
         }
 
-        capacity as u32 * durability as u32 * flavor as u32 * texture as u32
+        let calories: i32 = self
+            .inner
+            .iter()
+            .enumerate()
+            .map(|(i, ingredient)| ingredient.calories * teaspoons.get(i).unwrap())
+            .sum();
+
+        (
+            capacity as u32 * durability as u32 * flavor as u32 * texture as u32,
+            Some(calories),
+        )
     }
 }
 
@@ -144,7 +150,7 @@ impl Solution for Fourteen {
                 continue;
             }
 
-            let score = ingredients.compute_total_score(&teaspoons);
+            let (score, _) = ingredients.compute_total_score(&teaspoons);
 
             if score > max {
                 max = score;
@@ -156,11 +162,33 @@ impl Solution for Fourteen {
         max
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(ingredients: &Self::Parsed) -> Self::Output {
+        let mut teaspoons = vec![0; ingredients.inner.len()];
+
+        let mut max = 0;
+        let steps = 100usize.pow(teaspoons.len() as u32);
+
+        for _ in 0..steps {
+            if teaspoons.iter().copied().sum::<i32>() != 100 {
+                increment(&mut teaspoons);
+                continue;
+            }
+
+            let (score, calories) = ingredients.compute_total_score(&teaspoons);
+
+            if let Some(calories) = calories {
+                if calories == 500 && score > max {
+                    max = score;
+                }
+            }
+
+            increment(&mut teaspoons);
+        }
+
+        max
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (18965440, 0)
+        (18965440, 15862900)
     }
 }
