@@ -67,9 +67,9 @@ impl From<String> for Password {
     }
 }
 
-impl Into<String> for Password {
-    fn into(self) -> String {
-        self.0
+impl From<Password> for String {
+    fn from(value: Password) -> Self {
+        value.0
     }
 }
 
@@ -78,10 +78,10 @@ impl AddAssign<u32> for Password {
         let mut chars: Vec<char> = self.0.chars().collect();
 
         fn next_char(chr: char) -> char {
-            if ('a'..'z').contains(&chr) {
-                (chr as u8 + 1) as char
-            } else {
+            if chr == 'z' {
                 'a'
+            } else {
+                (chr as u8 + 1) as char
             }
         }
 

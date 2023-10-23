@@ -6,7 +6,7 @@ trait LookAndSay {
 
 impl LookAndSay for String {
     fn transform_sequence(&self) -> String {
-        let mut chars = self.chars().into_iter().peekable();
+        let mut chars = self.chars().peekable();
         let mut s = String::new();
 
         while let Some(curr) = chars.next() {

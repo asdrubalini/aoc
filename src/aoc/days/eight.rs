@@ -11,11 +11,11 @@ trait AocEncoded {
 
 impl AocEncoded for String {
     fn escape(s: &str) -> String {
-        let mut chars = s.chars().into_iter().peekable();
+        let chars = s.chars().peekable();
 
         let mut escaped_chars = VecDeque::new();
 
-        while let Some(chr) = chars.next() {
+        for chr in chars {
             match chr {
                 '\\' => {
                     escaped_chars.push_back("\\\\".to_string());
