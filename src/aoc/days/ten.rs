@@ -52,8 +52,14 @@ impl Solution for Ten {
         s.len() as u32
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut s = parsed.clone();
+
+        for _ in 0..50 {
+            s = s.transform_sequence();
+        }
+
+        s.len() as u32
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
