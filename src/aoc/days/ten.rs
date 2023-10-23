@@ -63,6 +63,6 @@ impl Solution for Ten {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (252594, 0)
+        (252594, 3579328)
     }
 }
