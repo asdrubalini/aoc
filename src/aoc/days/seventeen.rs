@@ -6,23 +6,8 @@ use crate::aoc::Solution;
 
 pub struct Seventeen;
 
-enum DoesFit {
-    NotEnough,
-    Yes,
-    TooMuch,
-}
-
-fn can_target_fit_in_containers(target: u32, containers: &[u32]) -> DoesFit {
-    let capacity = containers.iter().sum::<u32>();
-    // dbg!(capacity);
-
-    if capacity == target {
-        DoesFit::Yes
-    } else if capacity < target {
-        DoesFit::NotEnough
-    } else {
-        DoesFit::TooMuch
-    }
+fn can_target_fit_in_containers(target: u32, containers: &[u32]) -> bool {
+    containers.iter().sum::<u32>() == target
 }
 
 fn next_choice(choices: &mut [bool]) {
@@ -67,19 +52,15 @@ impl Solution for Seventeen {
     }
 
     fn solve_first(containers: &Self::Parsed) -> Self::Output {
-        let mut containers = containers.to_owned();
-        containers.sort();
-
         // Brute force all the combinations and count how many are valid
         let mut valid_combinations = 0;
         let mut choices = vec![false; containers.len()];
         let steps = 2u32.pow(choices.len() as u32);
 
         for _ in 0..steps {
-            match can_target_fit_in_containers(150, &dot_product(&choices, &containers)) {
-                DoesFit::NotEnough | DoesFit::TooMuch => (),
-                DoesFit::Yes => valid_combinations += 1,
-            };
+            if can_target_fit_in_containers(150, &dot_product(&choices, &containers)) {
+                valid_combinations += 1;
+            }
 
             next_choice(&mut choices);
         }
@@ -87,11 +68,35 @@ impl Solution for Seventeen {
         valid_combinations
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(containers: &Self::Parsed) -> Self::Output {
+        // Brute force all the combinations and count how many are valid
+        let mut choices = vec![false; containers.len()];
+        let steps = 2u32.pow(choices.len() as u32);
+
+        let mut current_min = usize::MAX;
+        let mut min_count = 0;
+
+        for _ in 0..steps {
+            let current_containers = dot_product(&choices, &containers);
+
+            if can_target_fit_in_containers(150, &current_containers) {
+                let containers_len = current_containers.len();
+
+                if containers_len == current_min {
+                    min_count += 1;
+                } else if containers_len < current_min {
+                    current_min = containers_len;
+                    min_count = 1;
+                }
+            }
+
+            next_choice(&mut choices);
+        }
+
+        min_count
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (1638, 0)
+        (1638, 17)
     }
 }
