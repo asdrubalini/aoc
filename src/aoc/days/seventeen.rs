@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use crate::aoc::Solution;
 
 pub struct Seventeen;
@@ -7,14 +9,14 @@ impl Solution for Seventeen {
     type Parsed = Vec<u32>;
 
     fn input() -> &'static str {
-        ""
+        include_str!("../inputs/17.txt")
     }
 
-    fn parse_input(_input: &'static str) -> Self::Parsed {
-        vec![]
+    fn parse_input(input: &'static str) -> Self::Parsed {
+        input.lines().map(|n| n.parse().unwrap()).collect_vec()
     }
 
-    fn solve_first(_parsed: &Self::Parsed) -> Self::Output {
+    fn solve_first(containers: &Self::Parsed) -> Self::Output {
         0
     }
 

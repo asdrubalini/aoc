@@ -17,5 +17,5 @@ macro_rules! debug_day {
 }
 
 fn main() {
-    debug_day!(Fifteen);
+    debug_day!(Seventeen);
 }

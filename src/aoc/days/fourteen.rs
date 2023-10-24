@@ -2,125 +2,125 @@ use itertools::Itertools;
 
 use crate::aoc::Solution;
 
-#[derive(Debug)]
-pub struct Ingredient {
-    capacity: i32,
-    durability: i32,
-    flavor: i32,
-    texture: i32,
-    calories: i32,
+#[derive(Debug, Clone, Copy)]
+pub enum ReindeerStatus {
+    Flying,
+    Resting,
 }
 
-impl From<&str> for Ingredient {
+#[derive(Debug, Clone, Copy)]
+pub struct Reindeer {
+    speed: u16,
+    fly_time: u16,
+    rest_time: u16,
+
+    status: ReindeerStatus,
+
+    flying_for: u16,
+    resting_for: u16,
+    space_travelled: u32,
+
+    points: u32,
+}
+
+impl From<&str> for Reindeer {
     fn from(line: &str) -> Self {
-        // Frosting: capacity 4, durability -2, flavor 0, texture 0, calories 5
-        let tokens = line.split(' ').collect_vec();
+        let tokens: Vec<&str> = line.split(' ').collect_vec();
 
-        let capacity = tokens.get(2).unwrap().replace(',', "").parse().unwrap();
-        let durability = tokens.get(4).unwrap().replace(',', "").parse().unwrap();
-        let flavor = tokens.get(6).unwrap().replace(',', "").parse().unwrap();
-        let texture = tokens.get(8).unwrap().replace(',', "").parse().unwrap();
-        let calories = tokens.get(10).unwrap().replace(',', "").parse().unwrap();
+        let speed = tokens.get(3).unwrap().parse().unwrap();
+        let fly_time = tokens.get(6).unwrap().parse().unwrap();
+        let rest_time = tokens.get(13).unwrap().parse().unwrap();
 
-        Ingredient {
-            capacity,
-            durability,
-            flavor,
-            texture,
-            calories,
+        Reindeer {
+            speed,
+            fly_time,
+            rest_time,
+
+            status: ReindeerStatus::Flying,
+
+            flying_for: 0,
+            resting_for: 0,
+            space_travelled: 0,
+
+            points: 0,
         }
     }
 }
 
-#[derive(Debug)]
-pub struct Ingredients {
-    inner: Vec<Ingredient>,
+impl Reindeer {
+    fn tick(&mut self) {
+        match self.status {
+            ReindeerStatus::Flying => {
+                if self.flying_for == self.fly_time {
+                    self.flying_for = 0;
+                    self.status = ReindeerStatus::Resting;
+                    self.resting_for = 1;
+                } else {
+                    self.flying_for += 1;
+                    self.space_travelled += self.speed as u32;
+                }
+            }
+
+            ReindeerStatus::Resting => {
+                if self.resting_for == self.rest_time {
+                    self.resting_for = 0;
+                    self.status = ReindeerStatus::Flying;
+
+                    self.flying_for = 1;
+                    self.space_travelled += self.speed as u32;
+                } else {
+                    self.resting_for += 1;
+                }
+            }
+        }
+    }
+
+    fn make_tick_winner(&mut self) {
+        self.points += 1;
+    }
 }
 
-impl FromIterator<Ingredient> for Ingredients {
-    fn from_iter<T: IntoIterator<Item = Ingredient>>(iter: T) -> Self {
-        Ingredients {
+#[derive(Clone, Debug)]
+pub struct Reindeers {
+    inner: Vec<Reindeer>,
+}
+
+impl FromIterator<Reindeer> for Reindeers {
+    fn from_iter<T: IntoIterator<Item = Reindeer>>(iter: T) -> Self {
+        Reindeers {
             inner: iter.into_iter().collect_vec(),
         }
     }
 }
 
-impl Ingredients {
-    fn compute_total_score(&self, teaspoons: &[i32]) -> (u32, Option<i32>) {
-        let capacity: i32 = self
-            .inner
-            .iter()
-            .enumerate()
-            .map(|(i, ingredient)| ingredient.capacity * teaspoons.get(i).unwrap())
-            .sum();
-
-        if capacity <= 0 {
-            return (0, None);
+impl Reindeers {
+    fn tick(&mut self) {
+        for reindeer in self.inner.iter_mut() {
+            reindeer.tick();
         }
 
-        let durability: i32 = self
-            .inner
-            .iter()
-            .enumerate()
-            .map(|(i, ingredient)| ingredient.durability * teaspoons.get(i).unwrap())
-            .sum();
-
-        if durability <= 0 {
-            return (0, None);
+        for reindeer in self.furthest_reindeers() {
+            reindeer.make_tick_winner();
         }
-
-        let flavor: i32 = self
-            .inner
-            .iter()
-            .enumerate()
-            .map(|(i, ingredient)| ingredient.flavor * teaspoons.get(i).unwrap())
-            .sum();
-
-        if flavor <= 0 {
-            return (0, None);
-        }
-
-        let texture: i32 = self
-            .inner
-            .iter()
-            .enumerate()
-            .map(|(i, ingredient)| ingredient.texture * teaspoons.get(i).unwrap())
-            .sum();
-
-        if texture <= 0 {
-            return (0, None);
-        }
-
-        let calories: i32 = self
-            .inner
-            .iter()
-            .enumerate()
-            .map(|(i, ingredient)| ingredient.calories * teaspoons.get(i).unwrap())
-            .sum();
-
-        (
-            capacity as u32 * durability as u32 * flavor as u32 * texture as u32,
-            Some(calories),
-        )
     }
-}
 
-fn increment(teaspoons: &mut Vec<i32>) {
-    let mut idx = teaspoons.len() - 1;
+    fn furthest_reindeers(&mut self) -> Vec<&mut Reindeer> {
+        self.inner
+            .sort_by(|a, b| a.space_travelled.cmp(&b.space_travelled));
 
-    loop {
-        let teaspoon = teaspoons.get_mut(idx).unwrap();
-        *teaspoon = if *teaspoon == 100 { 0 } else { *teaspoon + 1 };
+        let first = *self.inner.last().unwrap();
 
-        if *teaspoon != 0 {
-            break;
-        } else {
-            if idx == 0 {
-                return;
-            }
+        self.inner
+            .iter_mut()
+            .filter(|reindeer| reindeer.space_travelled == first.space_travelled)
+            .collect_vec()
+    }
 
-            idx -= 1;
-        }
+    fn winner(&self) -> Reindeer {
+        let mut sorted = self.inner.clone();
+        sorted.sort_by(|a, b| a.points.cmp(&b.points));
+
+        *sorted.last().unwrap()
     }
 }
 
@@ -128,67 +128,41 @@ pub struct Fourteen;
 
 impl Solution for Fourteen {
     type Output = u32;
-    type Parsed = Ingredients;
+    type Parsed = Reindeers;
 
     fn input() -> &'static str {
-        include_str!("../inputs/14.txt")
+        include_str!("../inputs/13.txt")
     }
 
     fn parse_input(input: &'static str) -> Self::Parsed {
-        input.lines().map(Ingredient::from).collect()
+        input.lines().map(Reindeer::from).collect()
     }
 
-    fn solve_first(ingredients: &Self::Parsed) -> Self::Output {
-        let mut teaspoons = vec![0; ingredients.inner.len()];
+    fn solve_first(parsed: &Self::Parsed) -> Self::Output {
+        let mut reindeers = parsed.to_owned();
 
-        let mut max = 0;
-        let steps = 100usize.pow(teaspoons.len() as u32);
-
-        for _ in 0..steps {
-            if teaspoons.iter().copied().sum::<i32>() != 100 {
-                increment(&mut teaspoons);
-                continue;
-            }
-
-            let (score, _) = ingredients.compute_total_score(&teaspoons);
-
-            if score > max {
-                max = score;
-            }
-
-            increment(&mut teaspoons);
+        for _ in 0..2503 {
+            reindeers.tick();
         }
 
-        max
+        reindeers
+            .furthest_reindeers()
+            .first()
+            .unwrap()
+            .space_travelled
     }
 
-    fn solve_second(ingredients: &Self::Parsed) -> Self::Output {
-        let mut teaspoons = vec![0; ingredients.inner.len()];
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut reindeers = parsed.to_owned();
 
-        let mut max = 0;
-        let steps = 100usize.pow(teaspoons.len() as u32);
-
-        for _ in 0..steps {
-            if teaspoons.iter().copied().sum::<i32>() != 100 {
-                increment(&mut teaspoons);
-                continue;
-            }
-
-            let (score, calories) = ingredients.compute_total_score(&teaspoons);
-
-            if let Some(calories) = calories {
-                if calories == 500 && score > max {
-                    max = score;
-                }
-            }
-
-            increment(&mut teaspoons);
+        for _ in 0..2503 {
+            reindeers.tick();
         }
 
-        max
+        reindeers.winner().points
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (18965440, 15862900)
+        (2655, 1059)
     }
 }
