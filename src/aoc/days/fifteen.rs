@@ -72,23 +72,15 @@ impl Solution for Fifteen {
 
     fn solve_first(aunts: &Self::Parsed) -> Self::Output {
         for aunt in aunts {
-            let matching_count = aunt
-                .objects
-                .iter()
-                .filter(|(object, value)| {
-                    if let Some(real_value) = TAPE.get(object.as_str()) {
-                        if *real_value == **value {
-                            true
-                        } else {
-                            false
-                        }
-                    } else {
-                        false
-                    }
-                })
-                .count();
+            let is_current_aunt = aunt.objects.iter().all(|(object, aunt_value)| {
+                if let Some(real_value) = TAPE.get(object.as_str()) {
+                    real_value == aunt_value
+                } else {
+                    false
+                }
+            });
 
-            if matching_count == aunt.objects.len() {
+            if is_current_aunt {
                 return aunt.id;
             }
         }
@@ -96,8 +88,31 @@ impl Solution for Fifteen {
         unreachable!();
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(aunts: &Self::Parsed) -> Self::Output {
+        for aunt in aunts {
+            let is_current_aunt = aunt.objects.iter().all(|(object, aunt_value)| {
+                // the cats and trees readings indicates that there are greater than that many
+                // the pomeranians and goldfish readings indicate that there are fewer than that many
+
+                if let Some(real_value) = TAPE.get(object.as_str()) {
+                    if object == "cats" || object == "trees" {
+                        aunt_value > real_value
+                    } else if object == "pomeranians" || object == "goldfish" {
+                        aunt_value < real_value
+                    } else {
+                        real_value == aunt_value
+                    }
+                } else {
+                    false
+                }
+            });
+
+            if is_current_aunt {
+                return aunt.id;
+            }
+        }
+
+        unreachable!();
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
