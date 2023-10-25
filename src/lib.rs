@@ -35,8 +35,8 @@ mod tests {
     test_day!(Eleven);
     test_day!(Twelve);
     test_day!(Thirteen);
+    test_day!(Fourteen);
     test_day!(Fifteen);
-    test_day!(Sixteen);
     test_day!(Sixteen);
     test_day!(Seventeen);
     test_day!(Eighteen);

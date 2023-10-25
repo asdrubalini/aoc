@@ -27,6 +27,59 @@ impl Coord {
     pub fn y_mut(&mut self) -> &mut i32 {
         &mut self.1
     }
+
+    pub fn neighbor_west(&self) -> Self {
+        let mut c = *self;
+        *c.x_mut() -= 1;
+        c
+    }
+
+    pub fn neighbor_east(&self) -> Self {
+        let mut c = *self;
+        *c.x_mut() += 1;
+        c
+    }
+
+    pub fn neighbor_north(&self) -> Self {
+        let mut c = *self;
+        *c.y_mut() += 1;
+        c
+    }
+
+    pub fn neighbor_south(&self) -> Self {
+        let mut c = *self;
+        *c.y_mut() -= 1;
+        c
+    }
+
+    pub fn neighbor_north_west(&self) -> Self {
+        self.neighbor_north().neighbor_west()
+    }
+
+    pub fn neighbor_north_east(&self) -> Self {
+        self.neighbor_north().neighbor_east()
+    }
+
+    pub fn neighbor_south_west(&self) -> Self {
+        self.neighbor_south().neighbor_west()
+    }
+
+    pub fn neighbor_south_east(&self) -> Self {
+        self.neighbor_south().neighbor_east()
+    }
+
+    pub fn all_neighbors_with_diagonal(&self) -> Vec<Self> {
+        vec![
+            self.neighbor_east(),
+            self.neighbor_north_east(),
+            self.neighbor_north(),
+            self.neighbor_north_west(),
+            self.neighbor_west(),
+            self.neighbor_south_west(),
+            self.neighbor_south(),
+            self.neighbor_south_east(),
+        ]
+    }
 }
 
 impl From<(i32, i32)> for Coord {
@@ -47,7 +100,7 @@ impl From<&str> for Coord {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct InfiniteMatrix<T: Debug> {
     inner: HashMap<Coord, T>,
 
@@ -77,11 +130,13 @@ impl<T: Debug> Default for InfiniteMatrix<T> {
     }
 }
 
-impl<T: Debug> IntoIterator for InfiniteMatrix<T> {
+impl<T: Debug + Default> IntoIterator for InfiniteMatrix<T> {
     type Item = (Coord, T);
     type IntoIter = hash_map::IntoIter<Coord, T>;
 
-    fn into_iter(self) -> Self::IntoIter {
+    fn into_iter(mut self) -> Self::IntoIter {
+        // Insert all the missing values first
+        self.allocate_all();
         self.inner.into_iter()
     }
 }
@@ -95,11 +150,11 @@ impl<T: Debug> InfiniteMatrix<T> {
         m
     }
 
-    pub fn new_fixed(width: i32, height: i32) -> Self {
+    pub fn new_fixed(width: usize, height: usize) -> Self {
         InfiniteMatrix {
             inner: HashMap::default(),
-            top_left_corner: Coord(-1, height),
-            bottom_right_corner: Coord(width, -1),
+            top_left_corner: Coord(-1, height as i32),
+            bottom_right_corner: Coord(width as i32, -1),
             fixed: true,
         }
     }
@@ -107,13 +162,16 @@ impl<T: Debug> InfiniteMatrix<T> {
     fn coord_is_in_matrix(&self, coord: Coord) -> bool {
         coord.x() > self.top_left_corner.x()
             && coord.x() < self.bottom_right_corner.x()
-            && coord.y() > self.top_left_corner.y()
-            && coord.y() < self.bottom_right_corner.y()
+            && coord.y() < self.top_left_corner.y()
+            && coord.y() > self.bottom_right_corner.y()
     }
 
     fn expand_corners_to_fit(&mut self, coord: Coord) {
         if self.fixed {
-            panic!("Trying to expand a fixed Matrix");
+            panic!(
+                "Trying to expand a fixed Matrix: {coord:?} while corners are {:?}, {:?}",
+                self.top_left_corner, self.bottom_right_corner
+            );
         }
 
         if coord.x() <= self.top_left_corner.x() {
@@ -164,6 +222,47 @@ impl<T: Debug> InfiniteMatrix<T> {
             }
         }
     }
+
+    pub fn coords_iterator(&self) -> SpaceCoordsIterator {
+        SpaceCoordsIterator::new(self.top_left_corner, self.bottom_right_corner)
+    }
+}
+
+impl<T: Debug + Default> InfiniteMatrix<T> {
+    fn allocate_all(&mut self) {
+        for coord in self.coords_iterator() {
+            assert!(self.coord_is_in_matrix(coord));
+
+            self.entry(coord).or_default();
+        }
+    }
+}
+
+pub struct SpaceCoordsIterator {
+    iter: Box<dyn Iterator<Item = Coord>>,
+}
+
+impl SpaceCoordsIterator {
+    fn new(top_left_corner: Coord, bottom_right_corner: Coord) -> Self {
+        let (start_x, start_y) = (top_left_corner.x() + 1, top_left_corner.y() - 1);
+        let (end_x, end_y) = (bottom_right_corner.x() - 1, bottom_right_corner.y() + 1);
+
+        let inner = (end_y..=start_y)
+            .rev()
+            .flat_map(move |y| (start_x..=end_x).into_iter().map(move |x| Coord(x, y)));
+
+        SpaceCoordsIterator {
+            iter: Box::new(inner),
+        }
+    }
+}
+
+impl Iterator for SpaceCoordsIterator {
+    type Item = Coord;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
+    }
 }
 
 #[cfg(test)]
@@ -206,5 +305,17 @@ mod tests {
 
         assert_eq!(m.top_left_corner, Coord(-11, 11));
         assert_eq!(m.bottom_right_corner, Coord(11, -11));
+    }
+
+    #[test]
+    fn test_fixed_matrix() {
+        let mut m = InfiniteMatrix::<()>::new_fixed(10, 10);
+        m.set(Coord(0, 0), ());
+    }
+
+    #[test]
+    fn test_coords_iterator() {
+        let m = InfiniteMatrix::<()>::new_fixed(10, 10);
+        assert_eq!(m.coords_iterator().count(), m.into_iter().count());
     }
 }
