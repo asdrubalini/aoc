@@ -116,6 +116,6 @@ impl Solution for Sixteen {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (373, 0)
+        (373, 260)
     }
 }
