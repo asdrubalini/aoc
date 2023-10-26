@@ -150,6 +150,14 @@ impl<T: Debug> InfiniteMatrix<T> {
         m
     }
 
+    pub fn cols(&self) -> i32 {
+        (self.top_left_corner.x() + 1).abs_diff(self.bottom_right_corner.x() - 1) as i32
+    }
+
+    pub fn rows(&self) -> i32 {
+        (self.top_left_corner.y() - 1).abs_diff(self.bottom_right_corner.y() + 1) as i32
+    }
+
     pub fn new_fixed(width: usize, height: usize) -> Self {
         InfiniteMatrix {
             inner: HashMap::default(),
@@ -249,7 +257,7 @@ impl SpaceCoordsIterator {
 
         let inner = (end_y..=start_y)
             .rev()
-            .flat_map(move |y| (start_x..=end_x).into_iter().map(move |x| Coord(x, y)));
+            .flat_map(move |y| (start_x..=end_x).map(move |x| Coord(x, y)));
 
         SpaceCoordsIterator {
             iter: Box::new(inner),

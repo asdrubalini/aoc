@@ -1,4 +1,4 @@
-use std::{mem, thread::current};
+use std::mem;
 
 use itertools::Itertools;
 
@@ -22,10 +22,10 @@ impl Solution for Eighteen {
         let width = lines.first().unwrap().len();
         let height = lines.len();
 
-        let mut m = InfiniteMatrix::new_fixed(width, height);
+        let mut m = InfiniteMatrix::<bool>::new_fixed(width, height);
 
         // Start from the bottom
-        let lines = lines.into_iter().rev().collect_vec();
+        let lines = lines.into_iter().rev();
 
         for (y, line) in lines.into_iter().enumerate() {
             for (x, state) in line.chars().enumerate() {
@@ -62,9 +62,8 @@ impl Solution for Eighteen {
 
                 let on_neighbors_count = neighbors.into_iter().filter(|state| *state).count();
 
-                *new_matrix.at_mut(coord).unwrap() = (current_status
-                    && (on_neighbors_count == 2 || on_neighbors_count == 3))
-                    || (!current_status && on_neighbors_count == 3);
+                *new_matrix.at_mut(coord).unwrap() =
+                    on_neighbors_count == 3 || current_status && on_neighbors_count == 2;
             }
 
             let _ = mem::replace(&mut matrix, new_matrix);
@@ -73,11 +72,47 @@ impl Solution for Eighteen {
         matrix.into_iter().filter(|(_coord, state)| *state).count() as u32
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(matrix: &Self::Parsed) -> Self::Output {
+        let mut matrix = matrix.to_owned();
+
+        let lights_stuck_on = [Coord(0, 0), Coord(99, 0), Coord(99, 99), Coord(0, 99)];
+
+        for coord in lights_stuck_on.iter() {
+            matrix.set(*coord, true);
+        }
+
+        let steps = 100;
+
+        for _ in 0..steps {
+            let mut new_matrix = matrix.clone();
+
+            for coord in matrix.coords_iterator() {
+                if lights_stuck_on.contains(&coord) {
+                    continue;
+                }
+
+                let current_status = *matrix.at(coord).unwrap();
+
+                let neighbors = coord
+                    .all_neighbors_with_diagonal()
+                    .into_iter()
+                    .filter_map(|coord| matrix.at(coord))
+                    .copied()
+                    .collect_vec();
+
+                let on_neighbors_count = neighbors.into_iter().filter(|state| *state).count();
+
+                *new_matrix.at_mut(coord).unwrap() =
+                    on_neighbors_count == 3 || current_status && on_neighbors_count == 2;
+            }
+
+            let _ = mem::replace(&mut matrix, new_matrix);
+        }
+
+        matrix.into_iter().filter(|(_coord, state)| *state).count() as u32
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (814, 924)
     }
 }

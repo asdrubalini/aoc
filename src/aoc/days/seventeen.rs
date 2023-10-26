@@ -23,7 +23,7 @@ fn next_choice(choices: &mut [bool]) {
     }
 }
 
-fn dot_product<'a>(choices: &[bool], containers: &[u32]) -> Vec<u32> {
+fn dot_product(choices: &[bool], containers: &[u32]) -> Vec<u32> {
     containers
         .iter()
         .zip(choices.iter())
@@ -58,7 +58,7 @@ impl Solution for Seventeen {
         let steps = 2u32.pow(choices.len() as u32);
 
         for _ in 0..steps {
-            if can_target_fit_in_containers(150, &dot_product(&choices, &containers)) {
+            if can_target_fit_in_containers(150, &dot_product(&choices, containers)) {
                 valid_combinations += 1;
             }
 
@@ -77,16 +77,18 @@ impl Solution for Seventeen {
         let mut min_count = 0;
 
         for _ in 0..steps {
-            let current_containers = dot_product(&choices, &containers);
+            let current_containers = dot_product(&choices, containers);
 
             if can_target_fit_in_containers(150, &current_containers) {
                 let containers_len = current_containers.len();
 
-                if containers_len == current_min {
-                    min_count += 1;
-                } else if containers_len < current_min {
-                    current_min = containers_len;
-                    min_count = 1;
+                match containers_len.cmp(&current_min) {
+                    std::cmp::Ordering::Less => {
+                        current_min = containers_len;
+                        min_count = 1;
+                    }
+                    std::cmp::Ordering::Equal => min_count += 1,
+                    std::cmp::Ordering::Greater => (),
                 }
             }
 
