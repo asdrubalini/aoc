@@ -34,9 +34,9 @@ impl NuclearPlant {
     fn molecule_process(&self, replacement: &Replacement) -> Vec<Vec<char>> {
         let mut results = vec![];
 
-        let mut windows = self.molecule.windows(replacement.from.len()).enumerate();
+        let windows = self.molecule.windows(replacement.from.len()).enumerate();
 
-        while let Some((i, chars)) = windows.next() {
+        for (i, chars) in windows {
             if chars != replacement.from {
                 continue;
             }
@@ -83,7 +83,6 @@ impl Solution for Nineteen {
 
         for replacement in &nuclear_plant.replacements {
             for result in nuclear_plant.molecule_process(replacement) {
-                if !seen_combinations.contains(&result) {}
                 seen_combinations.insert(result);
             }
         }
