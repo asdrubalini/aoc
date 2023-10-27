@@ -1,4 +1,8 @@
 use aoc::{days::*, Solution};
+use petgraph::{
+    dot::{Config, Dot},
+    Graph,
+};
 
 mod aoc;
 
@@ -7,10 +11,10 @@ macro_rules! debug_day {
         let input = $struct_name::input();
 
         let parsed = $struct_name::parse_input(input);
-        println!("Parsed: {:#?}", parsed);
+        //println!("Parsed: {:#?}", parsed);
 
         let solution_one = $struct_name::solve_first(&parsed);
-        println!("First solution: {:?}", solution_one);
+        //println!("First solution: {:?}", solution_one);
         let solution_two = $struct_name::solve_second(&parsed);
         println!("Second solution: {:?}", solution_two);
     };
@@ -18,4 +22,17 @@ macro_rules! debug_day {
 
 fn main() {
     debug_day!(Nineteen);
+
+    return;
+
+    let mut g = Graph::new();
+
+    g.add_node("ciaociao");
+
+    let a = g.add_node("ciaociao");
+    let b = g.add_node("byebye");
+
+    g.add_edge(a, b, 10);
+
+    println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
 }
