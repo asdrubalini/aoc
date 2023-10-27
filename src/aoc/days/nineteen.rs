@@ -1,15 +1,10 @@
-use core::panic;
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     fmt::Debug,
 };
 
 use itertools::Itertools;
-use petgraph::{
-    dot::{Config, Dot},
-    graph::NodeIndex,
-    Graph,
-};
+use petgraph::{graph::NodeIndex, Graph};
 
 use crate::aoc::Solution;
 
@@ -92,19 +87,15 @@ impl NuclearPlant {
             .to_owned()
     }
 
-    fn build_graph(&mut self, starting_molecule: &Molecule) -> Graph<String, ()> {
-        let mut g = Graph::<String, ()>::new();
-
-        let starting_molecule_node = self.molecule_upsert_node(&mut g, starting_molecule);
-
-        let mut queue: VecDeque<(Molecule, NodeIndex)> = VecDeque::new();
-        queue.push_back((starting_molecule.to_owned(), starting_molecule_node));
+    fn build_graph(&mut self, starting_molecule: Molecule) -> u32 {
+        let mut queue: VecDeque<Molecule> = VecDeque::new();
+        queue.push_back(starting_molecule);
 
         let mut count = 0;
 
-        while let Some((molecule, node)) = queue.pop_front() {
+        'outer: while let Some(molecule) = queue.pop_front() {
             // debug_molecule(&b_molecule);
-            dbg!(queue.iter().count());
+            // dbg!(queue.iter().count());
 
             let replacement_results = self
                 .replacements
@@ -115,32 +106,20 @@ impl NuclearPlant {
                 .collect_vec();
 
             for result in replacement_results {
-                let result_index = self.molecule_upsert_node(&mut g, &result);
-                g.add_edge(node, result_index, ());
-
+                dbg!(&result);
                 if result == self.target_molecule {
-                    println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
-                    panic!("done {count}");
+                    break 'outer;
                 }
 
-                let c = (result, result_index);
-
-                if !queue.contains(&c) {
-                    queue.push_back(c);
+                if !queue.contains(&result) {
+                    queue.push_back(result);
                 }
             }
 
             count += 1;
-
-            if count == 10 {
-                println!("{:?}", Dot::with_config(&g, &[Config::EdgeNoLabel]));
-
-                // dbg!(&queue);
-                panic!();
-            }
         }
 
-        g
+        count
     }
 }
 
@@ -188,7 +167,7 @@ impl Solution for Nineteen {
     fn solve_second(nuclear_plant: &Self::Parsed) -> Self::Output {
         let mut nuclear_plant = nuclear_plant.to_owned();
 
-        let g = nuclear_plant.build_graph(&vec!['e']);
+        let g = nuclear_plant.build_graph(vec!['e']);
 
         0
     }
