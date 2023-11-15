@@ -6,37 +6,46 @@ use itertools::Itertools;
 use crate::aoc::Solution;
 
 #[derive(Debug, Clone, Hash, PartialEq, Eq)]
-pub enum Wire {
+pub enum Address {
     Constant(u16),
     Named(String),
 }
 
-impl From<&&str> for Wire {
+impl From<&&str> for Address {
     fn from(name: &&str) -> Self {
         match name.parse::<u16>() {
-            Ok(constant) => Wire::Constant(constant),
-            Err(_) => Wire::Named(name.to_string()),
-        }
-    }
-}
-
-impl Wire {
-    fn get_number(&self, cpu: &Circuit) -> u16 {
-        match self {
-            Wire::Constant(constant) => *constant,
-            Wire::Named(_) => cpu.get(self),
+            Ok(constant) => Address::Constant(constant),
+            Err(_) => Address::Named(name.to_string()),
         }
     }
 }
 
 #[derive(Debug, Clone)]
 pub enum Instruction {
-    Load { dst: Wire, value: Wire },
-    And { src: (Wire, Wire), dst: Wire },
-    Or { src: (Wire, Wire), dst: Wire },
-    Not { src: Wire, dst: Wire },
-    LShift { src: (Wire, Wire), dst: Wire },
-    RShift { src: (Wire, Wire), dst: Wire },
+    Load {
+        dst: Address,
+        value: Address,
+    },
+    And {
+        src: (Address, Address),
+        dst: Address,
+    },
+    Or {
+        src: (Address, Address),
+        dst: Address,
+    },
+    Not {
+        src: Address,
+        dst: Address,
+    },
+    LShift {
+        src: (Address, Address),
+        dst: Address,
+    },
+    RShift {
+        src: (Address, Address),
+        dst: Address,
+    },
 }
 
 impl From<&str> for Instruction {
@@ -84,59 +93,70 @@ impl From<&str> for Instruction {
     }
 }
 
+pub enum CircuitElement {
+    Constant(u16),
+    CircuitElement(Box<CircuitElement>),
+}
+
 #[derive(Default)]
 pub struct Circuit {
-    state: HashMap<Wire, u16>,
+    state: HashMap<String, CircuitElement>,
 }
 
 impl Circuit {
-    fn dump_wires(&self) {
-        for (wire, value) in &self.state {
-            if let Wire::Named(name) = wire {
-                println!("{name}: {value}");
-            }
-        }
-    }
+    // fn dump_wires(&self) {
+    // for (wire, value) in &self.state {
+    // if let Wire::Named(name) = wire {
+    // println!("{name}: {value}");
+    // }
+    // }
+    // }
 
     fn exec(&mut self, instruction: &Instruction) {
         match instruction {
             Instruction::Load { dst, value } => {
-                let value = value.get_number(self);
-                self.state.insert(dst.clone(), value);
+                // let value = value.get_number(self);
+                // self.state.insert(dst.clone(), value);
             }
 
             Instruction::And { src, dst } => {
-                let src = (src.0.get_number(self), src.1.get_number(self));
-                self.state.insert(dst.clone(), src.0 & src.1);
+                // let src = (src.0.get_number(self), src.1.get_number(self));
+                // self.state.insert(dst.clone(), src.0 & src.1);
             }
 
             Instruction::Or { src, dst } => {
-                let src = (src.0.get_number(self), src.1.get_number(self));
-                self.state.insert(dst.clone(), src.0 | src.1);
+                // let src = (src.0.get_number(self), src.1.get_number(self));
+                // self.state.insert(dst.clone(), src.0 | src.1);
             }
 
             Instruction::Not { src, dst } => {
-                let src = src.get_number(self);
-                self.state.insert(dst.clone(), !src);
+                // let src = src.get_number(self);
+                // self.state.insert(dst.clone(), !src);
             }
 
             Instruction::LShift { src, dst } => {
-                let src = (src.0.get_number(self), src.1.get_number(self));
-                self.state.insert(dst.clone(), src.0 << src.1);
+                // let src = (src.0.get_number(self), src.1.get_number(self));
+                // self.state.insert(dst.clone(), src.0 << src.1);
             }
 
             Instruction::RShift { src, dst } => {
-                let src = (src.0.get_number(self), src.1.get_number(self));
-                self.state.insert(dst.clone(), src.0 >> src.1);
+                // let src = (src.0.get_number(self), src.1.get_number(self));
+                // self.state.insert(dst.clone(), src.0 >> src.1);
             }
         }
     }
 
-    fn get(&self, wire: &Wire) -> u16 {
-        self.state
-            .get(wire)
-            .map(ToOwned::to_owned)
-            .unwrap_or_default()
+    fn get(&self, wire: impl AsRef<str>) -> u16 {
+        let wire = wire.as_ref();
+
+        match self.state.get(wire).unwrap() {
+            CircuitElement::Constant(n) => *n,
+            CircuitElement::CircuitElement(elem) => todo!(),
+        }
+        // self.state
+        // .get(wire)
+        // .map(ToOwned::to_owned)
+        // .unwrap_or_default()
     }
 }
 
@@ -164,15 +184,17 @@ impl Solution for Seven {
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
-        let mut cpu = Circuit::default();
+        let mut circuit = Circuit::default();
 
         for instruction in parsed {
-            cpu.exec(instruction);
+            circuit.exec(instruction);
         }
 
-        cpu.dump_wires();
+        todo!()
 
-        cpu.get(&Wire::Named("a".to_string()))
+        // circuit.dump_wires();
+
+        // circuit.get(&InstructionAddress::Named("a".to_string()))
     }
 
     fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
