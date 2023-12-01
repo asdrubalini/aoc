@@ -1,11 +1,11 @@
 [package]
-name = "advent-of-code-2015"
+name = "advent-of-code-2023"
 version = "0.0.1"
 edition = "2021"
-default-run = "advent-of-code-2015"
+default-run = "advent-of-code-2023"
 
 [dependencies]
-itertools = "0.11"
+itertools = "0.12"
 paste = "1.0"
 convert_case = "0.6"
 
@@ -18,10 +18,10 @@ reqwest = { version = "0.11", features = [
 
 md-5 = "0.10"
 base16ct = { version = "0.2", features = ["alloc"] }
-petgraph = "0.6.4"
-json = "0.12.4"
-serde_json = "1.0.107"
-lazy_static = "1.4.0"
+petgraph = "0.6"
+json = "0.12"
+serde_json = "1.0"
+lazy_static = "1.4"
 
 [dev-dependencies]
 criterion = "0.5"
