@@ -1,4 +1,4 @@
-# Advent of Code 2022
+# Advent of Code 2023
 Run tests: `cargo test`
 
 Generate benchmarks: `cargo criterion --message-format=json | criterion-table > BENCHMARKS.md`
