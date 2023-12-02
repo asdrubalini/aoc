@@ -1,7 +1,4 @@
-use std::{char::REPLACEMENT_CHARACTER, collections::HashMap, iter::Sum};
-
 use itertools::Itertools;
-use serde_json::map;
 
 use crate::aoc::Solution;
 
