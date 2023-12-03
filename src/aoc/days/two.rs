@@ -121,6 +121,6 @@ impl Solution for Two {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (2563, 0)
+        (2563, 70768)
     }
 }
