@@ -54,18 +54,12 @@ impl Solution for Three {
                     }
 
                     if current_number.len() > 0 {
-                        let n = current_number.parse::<u32>().unwrap();
+                        let number = current_number.parse::<u32>().unwrap();
 
                         for i in 1..=current_number.len() {
-                            let c = Coord(coord.x() - i as i32, coord.y());
+                            let coord = Coord(coord.x() - i as i32, coord.y());
 
-                            transformed_matrix.set(
-                                c,
-                                Cell::PartNumber {
-                                    number: n,
-                                    unique_id,
-                                },
-                            );
+                            transformed_matrix.set(coord, Cell::PartNumber { number, unique_id });
                         }
 
                         unique_id += 1;
@@ -76,19 +70,14 @@ impl Solution for Three {
                 last_coord = coord;
             }
 
+            // Handle the edge case when there is a number at the end of the row
             if current_number.len() > 0 {
-                let n = current_number.parse::<u32>().unwrap();
+                let number = current_number.parse::<u32>().unwrap();
 
                 for i in 0..current_number.len() {
-                    let c = Coord(last_coord.x() - i as i32, last_coord.y());
+                    let coord = Coord(last_coord.x() - i as i32, last_coord.y());
 
-                    transformed_matrix.set(
-                        c,
-                        Cell::PartNumber {
-                            number: n,
-                            unique_id,
-                        },
-                    );
+                    transformed_matrix.set(coord, Cell::PartNumber { number, unique_id });
                 }
 
                 unique_id += 1;
@@ -101,32 +90,28 @@ impl Solution for Three {
             .into_iter()
             .filter(|c| matches!(transformed_matrix.at(*c).unwrap(), Cell::UnknownSymbol));
 
-        let mut neighbors_with_partnumber_unique = HashSet::new();
+        let mut neighbors_with_partnumber_unique = HashMap::new();
 
         for coord in coords_with_unknown_symbols {
             let neighbors = coord.all_neighbors_with_diagonal();
-            let neighbors_with_partnumber =
-                neighbors
-                    .into_iter()
-                    .filter_map(|c| match transformed_matrix.at(c) {
-                        Some(cell) => match cell {
-                            Cell::UnknownSymbol => None,
-                            Cell::Dot => None,
-                            Cell::PartNumber { number, unique_id } => Some((*number, *unique_id)),
-                        },
+            let neighbors_with_partnumber = neighbors.into_iter().filter_map(|c| {
+                if let Some(cell) = transformed_matrix.at(c) {
+                    if let Cell::PartNumber { number, unique_id } = cell {
+                        Some((*number, *unique_id))
+                    } else {
+                        None
+                    }
+                } else {
+                    None
+                }
+            });
 
-                        None => None,
-                    });
-
-            for n in neighbors_with_partnumber {
-                neighbors_with_partnumber_unique.insert(n);
+            for (part_number, unique_id) in neighbors_with_partnumber {
+                neighbors_with_partnumber_unique.insert(unique_id, part_number);
             }
         }
 
-        neighbors_with_partnumber_unique
-            .into_iter()
-            .map(|c| c.0) // sum part numbers
-            .sum()
+        neighbors_with_partnumber_unique.values().sum()
     }
 
     fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
