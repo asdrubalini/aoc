@@ -79,11 +79,10 @@ impl Solution for Two {
             .into_iter()
             .filter_map(|game| {
                 for set in game.sets.iter() {
-                    if set.red.unwrap_or_default() > max_red {
-                        return None;
-                    } else if set.green.unwrap_or_default() > max_green {
-                        return None;
-                    } else if set.blue.unwrap_or_default() > max_blue {
+                    if set.red.unwrap_or_default() > max_red
+                        || set.green.unwrap_or_default() > max_green
+                        || set.blue.unwrap_or_default() > max_blue
+                    {
                         return None;
                     }
                 }
@@ -93,8 +92,32 @@ impl Solution for Two {
             .sum()
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        parsed
+            .into_iter()
+            .filter_map(|game| {
+                let max_red = game
+                    .sets
+                    .iter()
+                    .map(|s| s.red.unwrap_or_default())
+                    .max()
+                    .unwrap();
+                let max_green = game
+                    .sets
+                    .iter()
+                    .map(|s| s.green.unwrap_or_default())
+                    .max()
+                    .unwrap();
+                let max_blue = game
+                    .sets
+                    .iter()
+                    .map(|s| s.blue.unwrap_or_default())
+                    .max()
+                    .unwrap();
+
+                return Some(max_red * max_green * max_blue);
+            })
+            .sum()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
