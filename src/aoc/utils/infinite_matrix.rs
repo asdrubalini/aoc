@@ -150,12 +150,14 @@ impl<T: Debug> InfiniteMatrix<T> {
         m
     }
 
-    pub fn cols(&self) -> i32 {
-        (self.top_left_corner.x() + 1).abs_diff(self.bottom_right_corner.x() - 1) as i32
+    pub fn cols_count(&self) -> usize {
+        panic!("untested");
+        (self.top_left_corner.x() + 1).abs_diff(self.bottom_right_corner.x() - 1) as usize
     }
 
-    pub fn rows(&self) -> i32 {
-        (self.top_left_corner.y() - 1).abs_diff(self.bottom_right_corner.y() + 1) as i32
+    pub fn rows_count(&self) -> usize {
+        panic!("untested");
+        (self.top_left_corner.y() - 1).abs_diff(self.bottom_right_corner.y() + 1) as usize
     }
 
     pub fn new_fixed(width: usize, height: usize) -> Self {
@@ -165,6 +167,19 @@ impl<T: Debug> InfiniteMatrix<T> {
             bottom_right_corner: Coord(width as i32, -1),
             fixed: true,
         }
+    }
+
+    pub fn from_other_matrix_config<A: Debug>(other: &InfiniteMatrix<A>) -> Self {
+        InfiniteMatrix {
+            inner: HashMap::default(),
+            top_left_corner: other.top_left_corner,
+            bottom_right_corner: other.bottom_right_corner,
+            fixed: other.fixed,
+        }
+    }
+
+    pub fn set_fixed(&mut self, fixed: bool) {
+        self.fixed = fixed;
     }
 
     fn coord_is_in_matrix(&self, coord: Coord) -> bool {
@@ -234,6 +249,30 @@ impl<T: Debug> InfiniteMatrix<T> {
     pub fn coords_iterator(&self) -> SpaceCoordsIterator {
         SpaceCoordsIterator::new(self.top_left_corner, self.bottom_right_corner)
     }
+
+    pub fn rows_iterator(&self) -> RowColsIterator {
+        RowColsIterator::new_rows(self.top_left_corner, self.bottom_right_corner)
+    }
+
+    /*
+    pub fn cols_iterator(&self) -> RowColsIterator {
+        RowColsIterator::new_cols(self.top_left_corner, self.bottom_right_corner)
+    }
+    */
+}
+
+impl<T: Debug> From<Vec<Vec<T>>> for InfiniteMatrix<T> {
+    fn from(input: Vec<Vec<T>>) -> Self {
+        let mut matrix = InfiniteMatrix::<T>::new_fixed(input.first().unwrap().len(), input.len());
+
+        for (y, line) in input.into_iter().rev().enumerate() {
+            for (x, item) in line.into_iter().enumerate() {
+                matrix.set(Coord(x as i32, y as i32), item);
+            }
+        }
+
+        matrix
+    }
 }
 
 impl<T: Debug + Default> InfiniteMatrix<T> {
@@ -250,10 +289,20 @@ pub struct SpaceCoordsIterator {
     iter: Box<dyn Iterator<Item = Coord>>,
 }
 
+fn get_boundaries_inclusive(
+    top_left_corner: Coord,
+    bottom_right_corner: Coord,
+) -> (i32, i32, i32, i32) {
+    let (start_x, start_y) = (top_left_corner.x() + 1, top_left_corner.y() - 1);
+    let (end_x, end_y) = (bottom_right_corner.x() - 1, bottom_right_corner.y() + 1);
+
+    (start_x, start_y, end_x, end_y)
+}
+
 impl SpaceCoordsIterator {
     fn new(top_left_corner: Coord, bottom_right_corner: Coord) -> Self {
-        let (start_x, start_y) = (top_left_corner.x() + 1, top_left_corner.y() - 1);
-        let (end_x, end_y) = (bottom_right_corner.x() - 1, bottom_right_corner.y() + 1);
+        let (start_x, start_y, end_x, end_y) =
+            get_boundaries_inclusive(top_left_corner, bottom_right_corner);
 
         let inner = (end_y..=start_y)
             .rev()
@@ -267,6 +316,48 @@ impl SpaceCoordsIterator {
 
 impl Iterator for SpaceCoordsIterator {
     type Item = Coord;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next()
+    }
+}
+
+pub struct RowColsIterator {
+    iter: Box<dyn Iterator<Item = Vec<Coord>>>,
+}
+
+impl RowColsIterator {
+    fn new_rows(top_left_corner: Coord, bottom_right_corner: Coord) -> Self {
+        let (start_x, start_y, end_x, end_y) =
+            get_boundaries_inclusive(top_left_corner, bottom_right_corner);
+
+        let inner = (end_y..=start_y)
+            .rev()
+            .map(move |y| (start_x..=end_x).map(move |x| Coord(x, y)).collect_vec());
+
+        RowColsIterator {
+            iter: Box::new(inner),
+        }
+    }
+
+    /*
+    fn new_cols(top_left_corner: Coord, bottom_right_corner: Coord) -> Self {
+        let (start_x, start_y, end_x, end_y) =
+            get_boundaries_inclusive(top_left_corner, bottom_right_corner);
+
+        let inner = (end_x..=start_x)
+            .rev()
+            .map(move |y| (end_y..=start_y).map(move |x| Coord(x, y)).collect_vec());
+
+        RowColsIterator {
+            iter: Box::new(inner),
+        }
+    }
+    */
+}
+
+impl Iterator for RowColsIterator {
+    type Item = Vec<Coord>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.iter.next()
@@ -326,4 +417,12 @@ mod tests {
         let m = InfiniteMatrix::<()>::new_fixed(10, 10);
         assert_eq!(m.coords_iterator().count(), m.into_iter().count());
     }
+
+    /*
+    #[test]
+    fn test_rows_iterator_count() {
+        let m = InfiniteMatrix::<()>::new_fixed(10, 10);
+        assert_eq!(m.rows_iterator().count(), m.rows_count());
+    }
+    */
 }
