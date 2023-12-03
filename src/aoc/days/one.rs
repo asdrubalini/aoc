@@ -11,7 +11,7 @@ trait Calibration {
 
 impl Calibration for u32 {
     fn calibrate_v1(line: &str) -> u32 {
-        let digits = line.chars().filter(|c| c.is_digit(10)).collect_vec();
+        let digits = line.chars().filter(|c| c.is_ascii_digit()).collect_vec();
 
         dbg!(&digits);
 
@@ -54,15 +54,15 @@ impl Solution for One {
     }
 
     fn parse_input(input: &'static str) -> Self::Parsed {
-        input.lines().into_iter().collect_vec()
+        input.lines().collect_vec()
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
-        parsed.into_iter().map(|l| u32::calibrate_v1(*l)).sum()
+        parsed.iter().map(|l| u32::calibrate_v1(l)).sum()
     }
 
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
-        parsed.into_iter().map(|l| u32::calibrate_v2(*l)).sum()
+        parsed.iter().map(|l| u32::calibrate_v2(l)).sum()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {

@@ -76,7 +76,7 @@ impl Solution for Two {
         let max_blue = 14;
 
         parsed
-            .into_iter()
+            .iter()
             .filter_map(|game| {
                 for set in game.sets.iter() {
                     if set.red.unwrap_or_default() > max_red
@@ -87,14 +87,14 @@ impl Solution for Two {
                     }
                 }
 
-                return Some(game.id);
+                Some(game.id)
             })
             .sum()
     }
 
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
         parsed
-            .into_iter()
+            .iter()
             .filter_map(|game| {
                 let max_red = game
                     .sets
@@ -115,7 +115,7 @@ impl Solution for Two {
                     .max()
                     .unwrap();
 
-                return Some(max_red * max_green * max_blue);
+                Some(max_red * max_green * max_blue)
             })
             .sum()
     }

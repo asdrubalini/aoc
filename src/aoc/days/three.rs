@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::HashMap;
 
 use itertools::Itertools;
 
@@ -44,7 +44,7 @@ impl Solution for Three {
             for coord in row {
                 let chr = parsed.at(coord).unwrap();
 
-                if chr.is_digit(10) {
+                if chr.is_ascii_digit() {
                     current_number.push(*chr);
                 } else {
                     if *chr == '.' {
@@ -53,7 +53,7 @@ impl Solution for Three {
                         transformed_matrix.set(coord, Cell::UnknownSymbol);
                     }
 
-                    if current_number.len() > 0 {
+                    if !current_number.is_empty() {
                         let number = current_number.parse::<u32>().unwrap();
 
                         for i in 1..=current_number.len() {
@@ -71,7 +71,7 @@ impl Solution for Three {
             }
 
             // Handle the edge case when there is a number at the end of the row
-            if current_number.len() > 0 {
+            if !current_number.is_empty() {
                 let number = current_number.parse::<u32>().unwrap();
 
                 for i in 0..current_number.len() {
@@ -87,7 +87,6 @@ impl Solution for Three {
 
         let coords_with_unknown_symbols = transformed_matrix
             .coords_iterator()
-            .into_iter()
             .filter(|c| matches!(transformed_matrix.at(*c).unwrap(), Cell::UnknownSymbol));
 
         let mut neighbors_with_partnumber_unique = HashMap::new();
@@ -97,13 +96,11 @@ impl Solution for Three {
             let neighbors_with_partnumber = neighbors.into_iter().filter_map(|c| {
                 if let Some(cell) = transformed_matrix.at(c) {
                     if let Cell::PartNumber { number, unique_id } = cell {
-                        Some((*number, *unique_id))
-                    } else {
-                        None
+                        return Some((*number, *unique_id));
                     }
-                } else {
-                    None
                 }
+
+                None
             });
 
             for (part_number, unique_id) in neighbors_with_partnumber {
