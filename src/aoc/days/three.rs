@@ -12,6 +12,7 @@ pub struct Three;
 #[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 enum Cell {
     UnknownSymbol,
+    Gear,
     Dot,
     PartNumber { number: u32, unique_id: u32 },
 }
@@ -81,7 +82,6 @@ impl Solution for Three {
                 }
 
                 unique_id += 1;
-                current_number = String::new();
             }
         }
 
@@ -111,11 +111,92 @@ impl Solution for Three {
         neighbors_with_partnumber_unique.values().sum()
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut transformed_matrix = InfiniteMatrix::<Cell>::from_other_matrix_config(parsed);
+        let mut unique_id = 0;
+
+        for row in parsed.rows_iterator() {
+            let mut current_number = String::new();
+            let mut last_coord = *row.first().unwrap();
+
+            for coord in row {
+                let chr = parsed.at(coord).unwrap();
+
+                if chr.is_ascii_digit() {
+                    current_number.push(*chr);
+                } else {
+                    if *chr == '.' {
+                        transformed_matrix.set(coord, Cell::Dot);
+                    } else if *chr == '*' {
+                        transformed_matrix.set(coord, Cell::Gear);
+                    } else {
+                        transformed_matrix.set(coord, Cell::UnknownSymbol);
+                    }
+
+                    if !current_number.is_empty() {
+                        let number = current_number.parse::<u32>().unwrap();
+
+                        for i in 1..=current_number.len() {
+                            let coord = Coord(coord.x() - i as i32, coord.y());
+
+                            transformed_matrix.set(coord, Cell::PartNumber { number, unique_id });
+                        }
+
+                        unique_id += 1;
+                        current_number = String::new();
+                    }
+                }
+
+                last_coord = coord;
+            }
+
+            // Handle the edge case when there is a number at the end of the row
+            if !current_number.is_empty() {
+                let number = current_number.parse::<u32>().unwrap();
+
+                for i in 0..current_number.len() {
+                    let coord = Coord(last_coord.x() - i as i32, last_coord.y());
+
+                    transformed_matrix.set(coord, Cell::PartNumber { number, unique_id });
+                }
+
+                unique_id += 1;
+            }
+        }
+
+        let coords_with_gears = transformed_matrix
+            .coords_iterator()
+            .filter(|c| matches!(transformed_matrix.at(*c).unwrap(), Cell::Gear));
+
+        coords_with_gears
+            .into_iter()
+            .filter_map(|coord| {
+                let neighbors = coord.all_neighbors_with_diagonal();
+                let neighbors_with_partnumber = neighbors
+                    .into_iter()
+                    .filter_map(|c| {
+                        if let Some(cell) = transformed_matrix.at(c) {
+                            if let Cell::PartNumber { number, unique_id } = cell {
+                                return Some((*number, *unique_id));
+                            }
+                        }
+
+                        None
+                    })
+                    .unique()
+                    .map(|c| c.0)
+                    .collect_vec();
+
+                if neighbors_with_partnumber.len() == 2 {
+                    Some(neighbors_with_partnumber[0] * neighbors_with_partnumber[1])
+                } else {
+                    None
+                }
+            })
+            .sum()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (540212, 0)
+        (540212, 87605697)
     }
 }
