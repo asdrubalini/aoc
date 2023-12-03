@@ -150,15 +150,15 @@ impl<T: Debug> InfiniteMatrix<T> {
         m
     }
 
+    /*
     pub fn cols_count(&self) -> usize {
-        panic!("untested");
         (self.top_left_corner.x() + 1).abs_diff(self.bottom_right_corner.x() - 1) as usize
     }
 
     pub fn rows_count(&self) -> usize {
-        panic!("untested");
         (self.top_left_corner.y() - 1).abs_diff(self.bottom_right_corner.y() + 1) as usize
     }
+    */
 
     pub fn new_fixed(width: usize, height: usize) -> Self {
         InfiniteMatrix {

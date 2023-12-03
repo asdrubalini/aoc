@@ -95,7 +95,7 @@ impl Solution for Two {
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
         parsed
             .iter()
-            .filter_map(|game| {
+            .map(|game| {
                 let max_red = game
                     .sets
                     .iter()
@@ -115,7 +115,7 @@ impl Solution for Two {
                     .max()
                     .unwrap();
 
-                Some(max_red * max_green * max_blue)
+                max_red * max_green * max_blue
             })
             .sum()
     }

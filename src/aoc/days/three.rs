@@ -94,13 +94,11 @@ impl Solution for Three {
         for coord in coords_with_unknown_symbols {
             let neighbors = coord.all_neighbors_with_diagonal();
             let neighbors_with_partnumber = neighbors.into_iter().filter_map(|c| {
-                if let Some(cell) = transformed_matrix.at(c) {
-                    if let Cell::PartNumber { number, unique_id } = cell {
-                        return Some((*number, *unique_id));
-                    }
+                if let Some(Cell::PartNumber { number, unique_id }) = transformed_matrix.at(c) {
+                    Some((*number, *unique_id))
+                } else {
+                    None
                 }
-
-                None
             });
 
             for (part_number, unique_id) in neighbors_with_partnumber {
@@ -175,13 +173,13 @@ impl Solution for Three {
                 let neighbors_with_partnumber = neighbors
                     .into_iter()
                     .filter_map(|c| {
-                        if let Some(cell) = transformed_matrix.at(c) {
-                            if let Cell::PartNumber { number, unique_id } = cell {
-                                return Some((*number, *unique_id));
-                            }
+                        if let Some(Cell::PartNumber { number, unique_id }) =
+                            transformed_matrix.at(c)
+                        {
+                            Some((*number, *unique_id))
+                        } else {
+                            None
                         }
-
-                        None
                     })
                     .unique()
                     .map(|c| c.0)
