@@ -1,4 +1,4 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use itertools::Itertools;
 
@@ -6,7 +6,7 @@ use crate::aoc::Solution;
 
 pub struct Four;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct Card {
     id: u32,
     winning_numbers: HashSet<u32>,
@@ -37,23 +37,19 @@ impl From<&str> for Card {
 
 impl Solution for Four {
     type Output = u32;
-    type Parsed = HashMap<u32, Card>;
+    type Parsed = Vec<Card>;
 
     fn input() -> &'static str {
         include_str!("../inputs/4.txt")
     }
 
     fn parse_input(input: &'static str) -> Self::Parsed {
-        input
-            .lines()
-            .map(Card::from)
-            .map(|card| (card.id, card))
-            .collect()
+        input.lines().map(Card::from).collect()
     }
 
     fn solve_first(parsed: &Self::Parsed) -> Self::Output {
         parsed
-            .values()
+            .iter()
             .map(|card| {
                 let matching_count = card
                     .my_numbers
@@ -70,11 +66,34 @@ impl Solution for Four {
             .sum()
     }
 
-    fn solve_second(_parsed: &Self::Parsed) -> Self::Output {
-        0
+    fn solve_second(parsed: &Self::Parsed) -> Self::Output {
+        let mut cards_counter: HashMap<u32, u32> =
+            HashMap::from_iter(parsed.into_iter().map(|card| (card.id, 1)));
+        let mut cards_queue =
+            BTreeMap::from_iter(parsed.into_iter().map(|card| (card.id, (card, 1))));
+
+        while let Some((this_card_id, (card, this_card_count))) = cards_queue.pop_first() {
+            let winners_count = card
+                .my_numbers
+                .iter()
+                .filter(|n| card.winning_numbers.contains(n))
+                .count();
+
+            for winner_id in (this_card_id + 1)..=(this_card_id + winners_count as u32) {
+                cards_queue
+                    .entry(winner_id)
+                    .and_modify(|(_card, count)| *count += this_card_count);
+
+                cards_counter
+                    .entry(winner_id)
+                    .and_modify(|count| *count += this_card_count);
+            }
+        }
+
+        cards_counter.values().sum()
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (20407, 0)
+        (20407, 23806951)
     }
 }
