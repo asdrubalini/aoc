@@ -68,9 +68,8 @@ impl Solution for Four {
 
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
         let mut cards_counter: HashMap<u32, u32> =
-            HashMap::from_iter(parsed.into_iter().map(|card| (card.id, 1)));
-        let mut cards_queue =
-            BTreeMap::from_iter(parsed.into_iter().map(|card| (card.id, (card, 1))));
+            HashMap::from_iter(parsed.iter().map(|card| (card.id, 1)));
+        let mut cards_queue = BTreeMap::from_iter(parsed.iter().map(|card| (card.id, (card, 1))));
 
         while let Some((this_card_id, (card, this_card_count))) = cards_queue.pop_first() {
             let winners_count = card
