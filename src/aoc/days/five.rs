@@ -1,4 +1,4 @@
-use std::{collections::HashMap, thread::current};
+use std::collections::HashMap;
 
 use itertools::Itertools;
 
@@ -141,6 +141,6 @@ impl Solution for Five {
     }
 
     fn expected_solutions() -> (Self::Output, Self::Output) {
-        (0, 0)
+        (579439039, 0)
     }
 }
