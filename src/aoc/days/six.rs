@@ -20,7 +20,6 @@ impl Race {
 
     fn bruteforce_record_breaking_ways_count(&self) -> u64 {
         (0..=self.time)
-            .into_iter()
             .filter(|hold_time| self.can_beat_the_record(*hold_time))
             .count() as u64
     }
@@ -41,7 +40,7 @@ pub struct SheetOfPaper {
 }
 
 impl SheetOfPaper {
-    fn into_v2(&self) -> Race {
+    fn clone_into_v2(&self) -> Race {
         let time: String = self
             .races
             .iter()
@@ -74,7 +73,7 @@ impl From<&str> for SheetOfPaper {
 
         let races = parse(lines.next().unwrap())
             .into_iter()
-            .zip(parse(lines.next().unwrap()).into_iter())
+            .zip(parse(lines.next().unwrap()))
             .map(Into::into)
             .collect_vec();
 
@@ -103,7 +102,7 @@ impl Solution for Six {
     }
 
     fn solve_second(parsed: &Self::Parsed) -> Self::Output {
-        let race = parsed.into_v2();
+        let race = parsed.clone_into_v2();
         race.bruteforce_record_breaking_ways_count()
     }
 
